@@ -639,7 +639,7 @@ Below are **four main strategies** for implementing the merchant-side verifier:
 
 ### **1. In-House Verifier Server**
 
-- **Description:**The merchant operates a self-managed verifier backend that:
+- **Description:** The merchant operates a self-managed verifier backend that:
 
   - Generates and signs `authorization_request` JWTs using **merchant-owned private keys**.
   - Receives and verifies wallet responses (VP tokens, SD-JWTs, KB-JWTs).
@@ -657,7 +657,7 @@ Below are **four main strategies** for implementing the merchant-side verifier:
 
 ### **2. Vendor-Managed Verifier API (Hosted Service)**
 
-- **Description:**A third-party **Verifier-as-a-Service** generates `authorization_request` JWTs and validates wallet responses.
+- **Description:** A third-party **Verifier-as-a-Service** generates `authorization_request` JWTs and validates wallet responses.
 
   - The **vendor manages signing keys** for JWTs.
   - Wallet responses may be encrypted with keys managed by the **vendor**.
