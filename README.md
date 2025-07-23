@@ -1,5 +1,5 @@
 
-# Stablecoin Payments with EUDI-like Data-Crypto Wallet
+# Stablecoin Payments with EUDI compliant Wallet
 
 This repository contains the specification for enabling **stablecoin payments** (e.g., USDC, DAI, Tezos-based stable assets) using an **EUDI Wallet** or equivalent **non-custodial data wallet**.  
 The specification focuses on combining **OIDC4VP**, **Verifiable Credentials (VCs)**, and **digital asset transfers** while ensuring **compliance with EU regulations** (e.g., MiCA, TFR, AMLD6) and **data privacy (GDPR)**.
@@ -10,7 +10,7 @@ The specification focuses on combining **OIDC4VP**, **Verifiable Credentials (VC
 
 The complete specification is detailed in the following document:
 
-- [**Stablecoin Payments with Data-Crypto Wallet (EUDI-like)**](stablecoin_oidc4vp.md)
+- [**Stablecoin Payments with EUDI compliant wallet**](stablecoin_oidc4vp.md)
 
 ---
 
@@ -35,8 +35,7 @@ The complete specification is detailed in the following document:
 ## Getting Started
 
 1. Read the main [specification document](stablecoin_oidc4vp.md).
-2. Explore error handling in [error_handling_and_recovery.md](error_handling_and_recovery.md).
-3. Use this as a foundation for developing compliant stablecoin payment solutions with EUDI-compatible wallets.
+2. Use this as a foundation for developing compliant stablecoin payment solutions with EUDI-compatible wallets.
 
 ---
 
