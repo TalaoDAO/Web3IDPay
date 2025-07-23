@@ -3,7 +3,6 @@
 - **Version** : 1.1
 - **Status** : Draft
 - **Maintainer** : Altme Identity & Compliance Team
-
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -27,9 +26,11 @@
    - [Key Binding JWT](#key-binding-jwt)
 5. [Security Considerations](#security-considerations)
 6. [Error Handling and Recovery](#error-handling-and-recovery)
-7. [Annex](#annex)
+7. [Merchant-Side Verifier Implementation Strategies](#merchant-side-verifier-implementation-strategies)
+8. [Annex](#annex)
    - [User Consent](#user-consent)
    - [Transaction Data](#transaction-data)
+
 
 ## Overview
 
@@ -63,14 +64,14 @@ This wallet profile leverages **OIDC4VP** and **SD-JWT VC** to ensure compliance
 The following table summarizes how the technical components address compliance requirements:
 
 
-| Requirement                 | Technical Solution                                  |
-| ----------------------------- | ----------------------------------------------------- |
+| Requirement                 | Technical Solution                                     |
+| ----------------------------- | -------------------------------------------------------- |
 | Proof of wallet ownership   | **Blockchain ownership SD-JWT VC** (linked to tx_hash) |
 | KYC / Identity verification | **Identity VC (PID/eID)** via SD-JWT VC                |
 | Data minimization (GDPR)    | **Selective disclosure** with SD-JWT VC                |
-| Auditability                | **Transaction receipts** with `tx_hash`             |
-| Integrity and authenticity  | **Signed JWT requests** and **KB JWT responses**    |
-| Confidentiality             | **JWE encrypted responses**                         |
+| Auditability                | **Transaction receipts** with `tx_hash`                |
+| Integrity and authenticity  | **Signed JWT requests** and **KB JWT responses**       |
+| Confidentiality             | **JWE encrypted responses**                            |
 
 ### Use Cases
 
@@ -509,15 +510,16 @@ Content-Type: application/x-www-form-urlencoded
 
 response=eyJra...9t2LQ
 ```
-The wallet’s response **SHOULD be encrypted as a JWE (JSON Web Encryption)**, depending on the selected merchant verifier strategy.  
 
-- When **personal data or sensitive claims are disclosed**, encryption **MUST** be applied to prevent intermediaries (e.g., external API verifiers or payment gateways) from accessing user data.  
-- If the merchant is using a fully **in-house verifier** with a secure channel (e.g., TLS and direct communication), encryption MAY be optional, depending on the privacy requirements.  
+The wallet’s response **SHOULD be encrypted as a JWE (JSON Web Encryption)**, depending on the selected merchant verifier strategy.
+
+- When **personal data or sensitive claims are disclosed**, encryption **MUST** be applied to prevent intermediaries (e.g., external API verifiers or payment gateways) from accessing user data.
+- If the merchant is using a fully **in-house verifier** with a secure channel (e.g., TLS and direct communication), encryption MAY be optional, depending on the privacy requirements.
 
 When JWE encryption is used:
+
 - The JWE `alg` header parameter **MUST** be `ECDH-ES` for key agreement using keys on the **P-256** curve.
 - The `enc` parameter **MUST** be `A128GCM` for symmetric encryption.
-
 
 The response is encrypted so that only the merchant can read its contents.
 However, the payload is not signed, meaning the JWE itself does not provide cryptographic proof of origin or end-to-end integrity beyond encryption. For higher security and non-repudiation, the payload should first be signed (JWS) and then encrypted, resulting in a nested JWT structure (JWS → JWE).
@@ -620,69 +622,104 @@ Payload of the KB JWT attached to the Identity SD-JWT VC with `transaction_data_
 ## Merchant-Side Verifier Implementation Strategies
 
 When designing the verifier infrastructure, merchants must balance **control**, **security**, and **privacy**.  
-One critical aspect is minimizing the exposure of personal data (e.g., identity attributes in SD-JWT VCs) to intermediaries or third-party services.  
+Key aspects include:
+- **Who controls the cryptographic keys** for `authorization_request` JWT signing and response decryption.
+- **How personal data is encrypted or exposed** when intermediaries are involved.
+- **What tools and technical expertise are needed** to maintain secure and compliant operations.
+
 Below are **four main strategies** for implementing the merchant-side verifier:
 
-
 ### **1. In-House Verifier Server**
+
 - **Description:**  
-  The merchant hosts its own verifier backend to:
-  - Generate and sign `authorization_request` JWTs.
-  - Verify wallet responses (VP tokens, SD-JWTs, KB-JWTs).
-  - Maintain its own x.509 keys, JWKS, and trusted registries.
-- **Advantages:**  
-  - No personal data is shared with external intermediaries.
-  - Full control over cryptographic operations and regulatory logging.
-  - Direct integration with payment and compliance systems.
-- **Disadvantages:**  
-  - Higher operational cost and complexity.
-  - Requires expertise in OIDC4VP and cryptographic protocols.
-- **Privacy Note:**  
-  This is the **most privacy-preserving** approach, as no third-party has access to user or transaction data.
+  The merchant operates a self-managed verifier backend that:
+  - Generates and signs `authorization_request` JWTs using **merchant-owned private keys**.
+  - Receives and verifies wallet responses (VP tokens, SD-JWTs, KB-JWTs).
+  - Decrypts responses using **merchant-owned encryption keys**.
+  - Manages its own x.509 certificates, JWKS, and trusted registries.
+
+- **Key Management:**  
+  Both **signing keys** (for JWTs) and **encryption keys** (for JWE responses) are entirely managed by the merchant.
+
+- **Privacy Impact:**  
+  This is the **most privacy-preserving** setup: no personal or transaction data is accessible to third parties.
+
+- **Merchant Requirements:**  
+  - Expertise in **OIDC4VP**, **SD-JWT VC verification**, and cryptographic libraries.
+  - Tools for **certificate lifecycle management** (e.g., HSMs, KMS, or secure vaults).
+  - Backend infrastructure to handle the verifier logic and audit logs.
 
 
 ### **2. Vendor-Managed Verifier API (Hosted Service)**
+
 - **Description:**  
-  A third-party "Verifier-as-a-Service" handles OIDC4VP request/response validation on behalf of the merchant.
-- **Advantages:**  
-  - Fast integration; no need to implement complex OIDC4VP parsing or SD-JWT validation.
-  - Service provider keeps up with the latest standards and regulatory changes.
-- **Disadvantages:**  
-  - The vendor may see transaction metadata or disclosed identity attributes unless encrypted.
-  - Merchant keys (or a proxy key) might need to be managed by the vendor.
-- **Privacy Note:**  
-  To mitigate data tracking, **personal attributes should be encrypted** so the vendor only sees verification results, not raw data.
+  A third-party **Verifier-as-a-Service** generates `authorization_request` JWTs and validates wallet responses.  
+  - The **vendor manages signing keys** for JWTs.  
+  - Wallet responses may be encrypted with keys managed by the **vendor**.
+
+- **Key Management:**  
+  - All keys (JWT signing and JWE decryption) are handled by the vendor.
+  - The merchant may receive only signed verification results or tokens.
+
+- **Privacy Impact:**  
+  The vendor could see **all disclosed personal attributes** and transaction metadata unless the payload is **double-encrypted** before sending to the vendor.
+
+- **Merchant Requirements:**  
+  - Minimal cryptographic expertise.
+  - Only API integration with the vendor is required.
 
 
 ### **3. Hybrid Model (API + Merchant Key Management)**
+
 - **Description:**  
-  Merchant generates and signs the `authorization_request` and encrypts the response, while using an external API for cryptographic validation of SD-JWT and VP tokens.
-- **Advantages:**  
-  - Merchant retains key ownership and minimizes data exposure.
-  - Reduces the burden of implementing full OIDC4VP logic internally.
-- **Disadvantages:**  
-  - Requires careful design of API calls to avoid leaking sensitive data.
-- **Privacy Note:**  
-  This model can ensure that **disclosed claims are never visible to the API** (only hashes or verification proofs are sent).
+  - The **vendor manages the signing keys** for `authorization_request` JWTs.  
+  - The **merchant manages the encryption keys** for decrypting wallet responses.  
+  - This means the vendor **cannot read personal claims** in wallet responses, but **does handle metadata** for initiating the flow.
+
+- **Key Management:**  
+  - Vendor: JWT signing key for authorization requests.  
+  - Merchant: JWE decryption key for the wallet response.
+
+- **Privacy Impact:**  
+  - The vendor sees the transaction setup (e.g., amount, nonce) but **not user identity data**, as it's encrypted.
+  - The merchant gains privacy over sensitive claims but must operate decryption tools.
+
+- **Merchant Requirements:**  
+  - Tools for **JWE decryption** and key rotation (e.g., KMS/HSM).  
+  - Light knowledge of cryptographic operations for handling encrypted responses.  
+  - API integration with the vendor.
 
 
 ### **4. Payment Link via Vendor Gateway**
+
 - **Description:**  
-  Instead of the merchant hosting a verifier, a **vendor provides a payment link or QR code** that redirects the customer to a **secure verifier/payment gateway**. The vendor then validates VPs and stablecoin transactions, returning the result to the merchant.
-- **Advantages:**  
-  - Easiest approach for merchants with minimal infrastructure.
-  - The vendor handles all cryptographic verification and blockchain interaction.
-- **Disadvantages:**  
-  - Vendor becomes an intermediary for all transaction and identity data, potentially tracking users across merchants.
-  - Merchant’s privacy assurances depend on the vendor’s compliance and trust framework.
-- **Privacy Note:**  
-  This model is the **least privacy-preserving**, but it can be mitigated if the vendor uses **zero-knowledge verification** and **data minimization** techniques.
+  - The vendor provides a **payment link or QR code** and manages the entire OIDC4VP and SD-JWT flow.  
+  - Merchant **does not manage any cryptographic keys**.
+  - Vendor returns a payment confirmation or status to the merchant.
+
+- **Key Management:**  
+  All keys (signing and encryption) are managed by the vendor.
+
+- **Privacy Impact:**  
+  - **Highest risk of data tracking** by the vendor, who has access to user identity data and payment metadata.
+  - Privacy relies solely on vendor compliance and policies.
+
+- **Merchant Requirements:**  
+  - No cryptographic expertise is required.
+  - Minimal technical setup: only process final verification callbacks or webhooks.
+
+
+### **Encryption and Response Handling**
+
+- If the **merchant controls the decryption keys (1 or 3)**, wallet responses **MUST be encrypted** (JWE with `ECDH-ES` and `A128GCM`) to ensure end-to-end confidentiality.
+- If **vendor manages all keys (2 or 4)**, the wallet **may return unencrypted responses** (signed-only) since data will be verified inside the vendor environment — but this reduces user privacy.
 
 
 ### **Suggested Approach**
-- For **maximum privacy and control**: use **In-House Verifier (1)** or **Hybrid (3)**.
-- For **fast deployment**: consider **Vendor-Managed API (2)** but ensure **end-to-end encryption of personal claims**.
-- For **small merchants**: **Payment Link (4)** may be easiest, but privacy risks must be disclosed to customers.
+- **Maximum privacy & compliance:** **In-House Verifier (1)**.
+- **Balanced control & outsourcing:** **Hybrid (3)**.
+- **Rapid integration:** **Vendor API (2)**, but enforce payload encryption.
+- **Minimal infrastructure:** **Payment Link (4)**, with explicit privacy risk acknowledgment.
 
 
 ## Security Considerations
