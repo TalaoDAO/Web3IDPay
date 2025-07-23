@@ -82,12 +82,17 @@ The following table summarizes how the technical components address compliance r
 
 ### Use Cases
 
-This wallet profile supports multiple real-world scenarios:
+This wallet profile supports a wide range of real-world scenarios, from retail payments to institutional services:
 
-1. **E-Commerce** – Users can pay for goods/services with stablecoins while sharing only minimal identity data.
-2. **NFT Marketplaces** – Identity verification for regulated NFT sales (e.g., AML thresholds).
-3. **DeFi & Web3 Services** – Verifiable account ownership for lending, staking, or DAO participation.
-4. **Cross-border Remittances** – Compliant, instant stablecoin transfers across jurisdictions.
+1. **E-Commerce** – Users can pay for goods/services with stablecoins while sharing only minimal identity data for AML/KYC compliance.
+2. **Banking and Institutional Services** – Banks or financial institutions can offer high-value clients a **regulated crypto management experience**, allowing verified customers to hold and transfer stablecoins while remaining fully compliant with AMLD6, MiCA, and national regulations.
+3. **Digital Identity-Linked Payments** – Combining verifiable identity (eIDAS 2.0, EUDI) with payments for scenarios like **age-restricted goods**, **ticketing**, or **government-related fees**, where identity confirmation is mandatory.
+4. **DeFi & Web3 Services** – Verifiable account ownership for lending, staking, or DAO participation, ensuring regulatory compliance for certain financial operations.
+5. **Cross-border Remittances** – Compliant, instant stablecoin transfers across jurisdictions with built-in audit trails.
+6. **Loyalty and Reward Programs** – Businesses can issue stablecoin-based rewards or vouchers tied to verifiable identity credentials, ensuring traceability and preventing fraud.
+7. **B2B Settlements and Supply Chain Payments** – Businesses can make fast, auditable stablecoin payments to verified suppliers, reducing settlement times and ensuring regulatory compliance.
+
+
 
 ### Standards and Technologies Used
 
