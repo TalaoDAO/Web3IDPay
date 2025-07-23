@@ -1,8 +1,10 @@
-# Stablecoin Payments with Data-Crypto Wallet (EUDI like)
+# Stablecoin Payments with EUDI compatible Wallet
 
-- **Version** : 1.1
+- **Version** : 1.2
+- **Date** : 23rd July 2025
 - **Status** : Draft
 - **Maintainer** : Altme Identity & Compliance Team
+
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -27,9 +29,14 @@
 5. [Security Considerations](#security-considerations)
 6. [Error Handling and Recovery](#error-handling-and-recovery)
 7. [Merchant-Side Verifier Implementation Strategies](#merchant-side-verifier-implementation-strategies)
+   - [In-House Verifier Server](#1-in-house-verifier-server)
+   - [Vendor-Managed Verifier API](#2-vendor-managed-verifier-api-hosted-service)
+   - [Hybrid Model (API + Merchant Key Management)](#3-hybrid-model-api--merchant-key-management)
+   - [Payment Link via Vendor Gateway](#4-payment-link-via-vendor-gateway)
 8. [Annex](#annex)
    - [User Consent](#user-consent)
    - [Transaction Data](#transaction-data)
+
 
 
 ## Overview
