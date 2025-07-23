@@ -1,6 +1,6 @@
 # Stablecoin Payments with EUDI compatible Wallet
 
-- **Version** : 1.2
+- **Version** : 1.3
 - **Date** : 23rd July 2025
 - **Status** : Draft
 - **Maintainer** : Altme Identity & Compliance Team
@@ -37,13 +37,11 @@
    - [User Consent](#user-consent)
    - [Transaction Data](#transaction-data)
 
-
-
 ## Overview
 
 ### Objectives
 
-This document describes how **stablecoin payments** (e.g., **USDC**, **USDT**, **DAI**, **BUSD**, **TUSD**) can be seamlessly supported using an **EUDI Wallet** or an equivalent **non-custodial data wallet** that implements **OIDC4VP**, **Verifiable Credentials (VCs)**, and **digital asset transfer mechanisms**.
+This document describes how **stablecoin payments** (e.g., **USDC**, **USDT**, **DAI**, **USDE**, **TUSD**) can be seamlessly supported using an **EUDI Wallet** or an equivalent **non-custodial data wallet** that implements **OIDC4VP**, **Verifiable Credentials (VCs)**, and **digital asset transfer mechanisms**.
 
 Rather than introducing a new protocol, it defines a **wallet profile** designed to ensure that **self-sovereign wallets** can comply with identity and digital transfer regulations (e.g., **MiCA**, **TFR**, **AMLD6**) while preserving user control and privacy.
 
@@ -91,8 +89,6 @@ This wallet profile supports a wide range of real-world scenarios, from retail p
 5. **Cross-border Remittances** – Compliant, instant stablecoin transfers across jurisdictions with built-in audit trails.
 6. **Loyalty and Reward Programs** – Businesses can issue stablecoin-based rewards or vouchers tied to verifiable identity credentials, ensuring traceability and preventing fraud.
 7. **B2B Settlements and Supply Chain Payments** – Businesses can make fast, auditable stablecoin payments to verified suppliers, reducing settlement times and ensuring regulatory compliance.
-
-
 
 ### Standards and Technologies Used
 
@@ -386,7 +382,7 @@ Payload
   A URL-encoded JSON structure defining the types of Verifiable Credentials (VCs) and claims the merchant requires from the wallet.
 - **`transaction_data`**
   A Base64 URL-encoded array of payment details, such as the amount, currency, payee, and purpose of the transaction.
-- **`client_metadata`**Metadata about the client, including the **JWKS** (JSON Web Key Set) used for encrypting the response from the wallet.
+- **`client_metadata`** Metadata about the client, including the **JWKS** (JSON Web Key Set) used for encrypting the response from the wallet.
 
   - **`keys`**: Contains public keys (e.g., EC keys on P-256 curve) used for ECDH key exchange.
 - **`exp`**
@@ -432,20 +428,20 @@ The transaction data must be BASE64 URL safe encoded before being added to the a
   In this case, it is `"stablecoin_payment"`.
 - **`credential_ids`**
   Identifiers of the Verifiable Credentials required or linked to the payment (e.g., `"eid-limited"`).
-- **`amount`**Describes the payment amount and currency:
+- **`amount`** Describes the payment amount and currency:
 
   - **`currency`** – The stablecoin currency code (e.g., `USDC`).
   - **`value`** – The payment amount as a string with decimals.
-- **`token`**Details of the stablecoin token contract:
+- **`token`** Details of the stablecoin token contract:
 
   - **`symbol`** – Token symbol (e.g., `USDC`).
   - **`contract_address`** – The contract address of the token on the blockchain (EVM format).
   - **`decimals`** – Number of decimal places used by the token.
-- **`network`**Describes the blockchain network where the payment occurs:
+- **`network`** Describes the blockchain network where the payment occurs:
 
   - **`name`** – Human-readable name (e.g., `Ethereum`).
   - **`chain_id`** – Numeric chain identifier for the network.
-- **`payee`**Information about the merchant or recipient of the payment:
+- **`payee`** Information about the merchant or recipient of the payment:
 
   - **`name`** – Merchant name (e.g., `ACME Store`).
   - **`wallet_address`** – Blockchain wallet address of the merchant (EVM format).
@@ -633,8 +629,8 @@ Payload of the KB JWT attached to the Identity SD-JWT VC with `transaction_data_
 
 ## Merchant-Side Verifier Implementation Strategies
 
-When designing the verifier infrastructure, merchants must balance **control**, **security**, and **privacy**.  
-Key aspects include:
+When designing the verifier infrastructure, merchants must balance **control**, **security**, and **privacy**.Key aspects include:
+
 - **Who controls the cryptographic keys** for `authorization_request` JWT signing and response decryption.
 - **How personal data is encrypted or exposed** when intermediaries are involved.
 - **What tools and technical expertise are needed** to maintain secure and compliant operations.
@@ -643,96 +639,89 @@ Below are **four main strategies** for implementing the merchant-side verifier:
 
 ### **1. In-House Verifier Server**
 
-- **Description:**  
-  The merchant operates a self-managed verifier backend that:
+- **Description:**The merchant operates a self-managed verifier backend that:
+
   - Generates and signs `authorization_request` JWTs using **merchant-owned private keys**.
   - Receives and verifies wallet responses (VP tokens, SD-JWTs, KB-JWTs).
   - Decrypts responses using **merchant-owned encryption keys**.
   - Manages its own x.509 certificates, JWKS, and trusted registries.
-
-- **Key Management:**  
+- **Key Management:**
   Both **signing keys** (for JWTs) and **encryption keys** (for JWE responses) are entirely managed by the merchant.
-
-- **Privacy Impact:**  
+- **Privacy Impact:**
   This is the **most privacy-preserving** setup: no personal or transaction data is accessible to third parties.
+- **Merchant Requirements:**
 
-- **Merchant Requirements:**  
   - Expertise in **OIDC4VP**, **SD-JWT VC verification**, and cryptographic libraries.
   - Tools for **certificate lifecycle management** (e.g., HSMs, KMS, or secure vaults).
   - Backend infrastructure to handle the verifier logic and audit logs.
 
-
 ### **2. Vendor-Managed Verifier API (Hosted Service)**
 
-- **Description:**  
-  A third-party **Verifier-as-a-Service** generates `authorization_request` JWTs and validates wallet responses.  
-  - The **vendor manages signing keys** for JWTs.  
-  - Wallet responses may be encrypted with keys managed by the **vendor**.
+- **Description:**A third-party **Verifier-as-a-Service** generates `authorization_request` JWTs and validates wallet responses.
 
-- **Key Management:**  
+  - The **vendor manages signing keys** for JWTs.
+  - Wallet responses may be encrypted with keys managed by the **vendor**.
+- **Key Management:**
+
   - All keys (JWT signing and JWE decryption) are handled by the vendor.
   - The merchant may receive only signed verification results or tokens.
-
-- **Privacy Impact:**  
+- **Privacy Impact:**
   The vendor could see **all disclosed personal attributes** and transaction metadata unless the payload is **double-encrypted** before sending to the vendor.
+- **Merchant Requirements:**
 
-- **Merchant Requirements:**  
   - Minimal cryptographic expertise.
   - Only API integration with the vendor is required.
 
-
 ### **3. Hybrid Model (API + Merchant Key Management)**
 
-- **Description:**  
-  - The **vendor manages the signing keys** for `authorization_request` JWTs.  
-  - The **merchant manages the encryption keys** for decrypting wallet responses.  
+- **Description:**
+
+  - The **vendor manages the signing keys** for `authorization_request` JWTs.
+  - The **merchant manages the encryption keys** for decrypting wallet responses.
   - This means the vendor **cannot read personal claims** in wallet responses, but **does handle metadata** for initiating the flow.
+- **Key Management:**
 
-- **Key Management:**  
-  - Vendor: JWT signing key for authorization requests.  
+  - Vendor: JWT signing key for authorization requests.
   - Merchant: JWE decryption key for the wallet response.
+- **Privacy Impact:**
 
-- **Privacy Impact:**  
   - The vendor sees the transaction setup (e.g., amount, nonce) but **not user identity data**, as it's encrypted.
   - The merchant gains privacy over sensitive claims but must operate decryption tools.
+- **Merchant Requirements:**
 
-- **Merchant Requirements:**  
-  - Tools for **JWE decryption** and key rotation (e.g., KMS/HSM).  
-  - Light knowledge of cryptographic operations for handling encrypted responses.  
+  - Tools for **JWE decryption** and key rotation (e.g., KMS/HSM).
+  - Light knowledge of cryptographic operations for handling encrypted responses.
   - API integration with the vendor.
-
 
 ### **4. Payment Link via Vendor Gateway**
 
-- **Description:**  
-  - The vendor provides a **payment link or QR code** and manages the entire OIDC4VP and SD-JWT flow.  
+- **Description:**
+
+  - The vendor provides a **payment link or QR code** and manages the entire OIDC4VP and SD-JWT flow.
   - Merchant **does not manage any cryptographic keys**.
   - Vendor returns a payment confirmation or status to the merchant.
-
-- **Key Management:**  
+- **Key Management:**
   All keys (signing and encryption) are managed by the vendor.
+- **Privacy Impact:**
 
-- **Privacy Impact:**  
   - **Highest risk of data tracking** by the vendor, who has access to user identity data and payment metadata.
   - Privacy relies solely on vendor compliance and policies.
+- **Merchant Requirements:**
 
-- **Merchant Requirements:**  
   - No cryptographic expertise is required.
   - Minimal technical setup: only process final verification callbacks or webhooks.
-
 
 ### **Encryption and Response Handling**
 
 - If the **merchant controls the decryption keys (1 or 3)**, wallet responses **MUST be encrypted** (JWE with `ECDH-ES` and `A128GCM`) to ensure end-to-end confidentiality.
 - If **vendor manages all keys (2 or 4)**, the wallet **may return unencrypted responses** (signed-only) since data will be verified inside the vendor environment — but this reduces user privacy.
 
-
 ### **Suggested Approach**
+
 - **Maximum privacy & compliance:** **In-House Verifier (1)**.
 - **Balanced control & outsourcing:** **Hybrid (3)**.
 - **Rapid integration:** **Vendor API (2)**, but enforce payload encryption.
 - **Minimal infrastructure:** **Payment Link (4)**, with explicit privacy risk acknowledgment.
-
 
 ## Security Considerations
 
