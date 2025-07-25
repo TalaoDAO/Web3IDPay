@@ -1,6 +1,6 @@
 # Stablecoin Payments with EUDI compatible Wallet
 
-- **Version** : 1.5
+- **Version** : 1.6
 - **Date** : 25th July 2025
 - **Status** : Draft
 - **Maintainer** : Altme Identity & Compliance Team
@@ -12,15 +12,14 @@
    - [Compliance Mapping](#compliance-mapping)  
    - [Standards and Technologies Used](#standards-and-technologies-used)  
 2. [Use Cases](#use-cases)  
-   - [1. E-Commerce Payments (Retail)](#1-e-commerce-payments-retail)  
-   - [2. Banking & Institutional Services](#2-banking--institutional-services)  
-   - [3. Digital Identity-Linked Payments](#3-digital-identity-linked-payments)  
-   - [4. DeFi & Web3 Services](#4-defi--web3-services)  
-   - [5. Cross-Border Remittances](#5-cross-border-remittances)  
-   - [6. Loyalty and Reward Programs](#6-loyalty-and-reward-programs)  
-   - [7. B2B Settlements & Supply Chain Payments](#7-b2b-settlements--supply-chain-payments)  
-   - [8. Tokenized Financial Products (Flagship Use Case)](#8-tokenized-financial-products-flagship-use-case)  
-   - [Highlight: Why Tokenized Products are the Best Use Case](#highlight-why-tokenized-products-are-the-best-use-case)  
+   - [E-Commerce Payments (Retail)](#1-e-commerce-payments-retail)  
+   - [Banking & Institutional Services](#2-banking--institutional-services)  
+   - [Digital Identity-Linked Payments](#3-digital-identity-linked-payments)  
+   - [DeFi & Web3 Services](#4-defi--web3-services)  
+   - [Cross-Border Remittances](#5-cross-border-remittances)  
+   - [Loyalty and Reward Programs](#6-loyalty-and-reward-programs)  
+   - [B2B Settlements & Supply Chain Payments](#7-b2b-settlements--supply-chain-payments)  
+   - [Tokenized Financial Products (Flagship Use Case)](#8-tokenized-financial-products-flagship-use-case)  
 3. [Payment Flow](#payment-flow)  
    - [Preconditions](#preconditions)  
    - [Flow Steps](#flow-steps)  
@@ -34,19 +33,21 @@
    - [Presentation Submission](#presentation-submission)  
    - [VP Token](#vp-token)  
    - [Key Binding JWT](#key-binding-jwt)  
-6. [Verifier Implementation Strategies (Verifier, Vendor, Beneficiary Roles)](#verifier-implementation-strategies-verifier-vendor-and-beneficiary-roles)  
-   - [Scenario 1 – Verifier = Beneficiary (Self-Custody Model)](#scenario-1--verifier--beneficiary-self-custody-model)  
-   - [Scenario 2 – Verifier = Vendor (Vendor as Beneficiary Wallet)](#scenario-2--verifier--vendor-vendor-as-beneficiary-wallet)  
-   - [Scenario 3 – Split Role (Verifier = Vendor + Beneficiary)](#scenario-3--split-role-verifier--vendor--beneficiary)  
-   - [Scenario 4 – Vendor Gateway (Verifier and Wallet Fully Outsourced)](#scenario-4--vendor-gateway-verifier-and-wallet-fully-outsourced)  
-   - [Scenario 5 – Peer-to-Peer Wallet (Verifier Separate, Wallets User-Controlled)](#scenario-5--peer-to-peer-wallet-verifier-separate-wallets-user-controlled)  
-   - [Comparison Table](#comparison-table)  
-   - [Regulatory Recommendations](#regulatory-recommendations)  
-7. [Security Considerations](#security-considerations)  
-8. [Error Handling and Recovery](#error-handling-and-recovery)  
-9. [Annex](#annex)  
+6. [Security Considerations](#security-considerations)  
+7. [Error Handling and Recovery](#error-handling-and-recovery)  
+8. [Annex](#annex)  
    - [User Consent](#user-consent)  
-   - [Transaction Data](#transaction-data)
+   - [Transaction Data](#transaction-data)  
+   - [Verifier Implementation Strategies (Verifier, Vendor, and Beneficiary Roles)](#verifier-implementation-strategies-verifier-vendor-and-beneficiary-roles)  
+     - [Scenario 1 – Verifier = Beneficiary (Self-Custody Model)](#scenario-1--verifier--beneficiary-self-custody-model)  
+     - [Scenario 2 – Verifier = Vendor (Vendor as Beneficiary Wallet)](#scenario-2--verifier--vendor-vendor-as-beneficiary-wallet)  
+     - [Scenario 3 – Split Role (Verifier = Vendor + Beneficiary)](#scenario-3--split-role-verifier--vendor--beneficiary)  
+     - [Scenario 4 – Vendor Gateway (Verifier and Wallet Fully Outsourced)](#scenario-4--vendor-gateway-verifier-and-wallet-fully-outsourced)  
+     - [Scenario 5 – Peer-to-Peer Wallet (Verifier Separate, Wallets User-Controlled)](#scenario-5--peer-to-peer-wallet-verifier-separate-wallets-user-controlled)  
+     - [Comparison Table](#comparison-table)  
+     - [Regulatory Recommendations](#regulatory-recommendations)
+
+
 
 
 ## Overview
@@ -135,137 +136,154 @@ This wallet profile builds upon several open standards and technologies to ensur
   - **QR Codes / Deep Links** – For wallet-verifier interaction.
   - **HTTP POST / direct_post.jwt** – For delivering encrypted VP responses.
 
-
 ## Use Cases
 
-This wallet profile enables a **new generation of compliant, privacy-preserving stablecoin payments** by combining **EUDI-based identity credentials** with **self-custodial crypto transactions**. It covers both **consumer** and **institutional** scenarios where **identity verification and instant settlement** are equally important.
+This wallet profile enables a **new generation of compliant, privacy-preserving stablecoin payments** by combining **EUDI-based identity credentials** with **self-custodial crypto transactions**.  
+The following use cases are mapped to **Verifier Implementation Strategies** (see [Verifier Implementation Strategies](#verifier-implementation-strategies-verifier-vendor-and-beneficiary-roles)).
 
 
 
-### **1. E-Commerce Payments (Retail)**
-
-**Example Scenario:**  
-A user purchases electronics online and pays **100 USDC** directly to the merchant using a **self-custodial wallet**.
-
-**Key Benefits:**  
-- **Seamless Checkout:** Scanning a QR code launches the EUDI wallet, combining **payment authorization + identity verification** in a single step.  
-- **AML/KYC Compliance:** Shares **only minimal identity data** (e.g., age confirmation or name), via **selective disclosure (SD-JWT)**.  
-- **Faster Settlement:** On-chain stablecoin settlement avoids chargebacks and reduces transaction costs.
-
-**Best Fit:**  
-Merchants seeking **low-cost, instant global payments** with privacy-preserving KYC.
-
-
-
-### **2. Banking & Institutional Services**
+### **1. E-Commerce Payments (Retail)**  
+**Verifier Strategy:** **Scenario 1 (Verifier = Beneficiary)** or **Scenario 3 (Split Role)**  
 
 **Example Scenario:**  
-A private bank enables high-net-worth clients to transfer **EURC** while meeting MiCA and TFR obligations.
+A user purchases electronics online and pays **100 USDC** directly to the merchant’s wallet.
 
 **Key Benefits:**  
-- **Regulatory Compliance:** Clients present **verifiable KYC credentials** using **OIDC4VP** and **SD-JWT**, ensuring full AML checks.  
-- **Identity-Payment Binding:** Every transaction is cryptographically linked to identity proofs via **Key Binding JWTs**.  
-- **Non-Custodial Transfers:** Users hold funds in their own wallet; the bank only receives payments into its self-custody account, avoiding CASP obligations.
+- **Seamless Checkout:** The QR code triggers the **EUDI wallet** for both payment and identity verification.  
+- **AML/KYC Compliance:** Only essential data (e.g., name or age) is disclosed via **SD-JWT**.  
+- **Fast Settlement:** Stablecoin transfers eliminate chargebacks and high card fees.
 
 **Best Fit:**  
-Banks and regulated entities that need **compliant crypto rails** and **real-time settlements**.
+- **Scenario 1**: For large merchants managing their own compliance and self-custody wallet.  
+- **Scenario 3**: For merchants relying on a **vendor** to handle OIDC4VP flows but keeping direct custody of funds.
 
 
 
-### **3. Digital Identity-Linked Payments**
+### **2. Banking & Institutional Services**  
+**Verifier Strategy:** **Scenario 1 (Verifier = Beneficiary)**  
 
 **Example Scenario:**  
-A user buys **age-restricted event tickets** or pays for **government services** that require strong identity verification.
+A private bank allows high-net-worth clients to buy a **tokenized bond** or **deposit stablecoins** using their **self-custodial EUDI wallet**.
 
 **Key Benefits:**  
-- **One-Step Identity + Payment:** The wallet confirms identity and completes the payment in the same flow.  
-- **Selective Disclosure:** Only necessary attributes (e.g., "over 18") are shared, ensuring **GDPR compliance**.  
-- **Traceability:** Payments and identity claims are linked via **transaction hashes** for legal reporting.
+- **Regulatory Compliance:** The bank acts as verifier, receiving **KYC/AML proofs** directly from the wallet.  
+- **Non-Custodial Transfers:** Users retain control of funds until payment settlement.  
+- **Audit-Ready:** Every payment is linked to a verifiable proof (`tx_hash` + KB JWT).
 
 **Best Fit:**  
-Ticketing platforms, public sector payments, and regulated retailers.
+Banks and financial institutions that are already **regulated** and prefer to avoid delegating compliance to external CASPs.
 
-### **4. DeFi & Web3 Services**
+
+
+### **3. Digital Identity-Linked Payments**  
+**Verifier Strategy:** **Scenario 1** or **Scenario 3**  
 
 **Example Scenario:**  
-A DAO requires verified KYC for members participating in on-chain governance or staking.
+A user pays for **age-restricted goods** (e.g., alcohol delivery) or **government fees** while proving age or legal identity via EUDI credentials.
 
 **Key Benefits:**  
-- **Proof of Verified User:** Users can present **KYC credentials** without revealing all personal data.  
-- **Ownership Proof:** Blockchain accounts are linked to user credentials via **blockchain ownership SD-JWT**.  
-- **Regulatory Gatekeeping:** Ensures compliance for DeFi protocols without sacrificing decentralization.
+- **Single Flow:** Payment and age verification happen in one step.  
+- **Selective Disclosure:** Only “age over 18” is shared, **not full DOB**.  
+- **Regulatory Traceability:** Payments are linked to disclosed attributes and `tx_hash`.
 
 **Best Fit:**  
-DeFi protocols, staking services, and DAOs with **compliance requirements**.
+Retailers or public authorities with **in-house verifier setups (Scenario 1)** or **vendor-assisted OIDC4VP (Scenario 3)**.
 
 
 
-### **5. Cross-Border Remittances**
+### **4. DeFi & Web3 Services**  
+**Verifier Strategy:** **Scenario 5 (Peer-to-Peer Wallet)**  
 
 **Example Scenario:**  
-An individual in Germany sends **500 USDC** to family in the Philippines.
+A DAO requires **verified KYC members** for voting or staking, but without relying on centralized custody.
 
 **Key Benefits:**  
-- **Instant Transfers:** Stablecoin transactions avoid delays and high remittance fees.  
-- **Built-In KYC & TFR Compliance:** Each transaction includes **identity-linked proofs** for AML checks.  
-- **Auditability:** Wallet generates **verifiable payment receipts** with `tx_hash` and identity data hashes.
+- **Decentralized Verification:** The DAO acts as verifier but never touches user funds.  
+- **Compliance Layer:** On-chain identity proofs (SD-JWT for account ownership) allow regulatory access control.  
+- **Self-Custody:** Users sign payments and staking transactions themselves.
 
 **Best Fit:**  
-Remittance services and global payment gateways.
+DAOs, DEXs, and Web3 apps needing **compliance but no custodial risk**.
 
 
 
-### **6. Loyalty and Reward Programs**
+### **5. Cross-Border Remittances**  
+**Verifier Strategy:** **Scenario 5 (Peer-to-Peer)** or **Scenario 3**  
 
 **Example Scenario:**  
-A retailer issues **stablecoin-based loyalty rewards** redeemable across its store network.
+An individual in Germany sends **500 USDC** directly to family in the Philippines.
 
 **Key Benefits:**  
-- **Fraud Prevention:** Rewards are linked to **verified identities** to prevent abuse.  
-- **Instant Redemption:** Tokens can be spent or transferred on-chain instantly.  
-- **Cross-Vendor Interoperability:** Stablecoin rewards can integrate with multiple merchants.
+- **No Intermediary Custody:** Stablecoins move **P2P from sender to receiver**.  
+- **Compliance by Design:** AML and TFR compliance ensured via SD-JWT & KB JWT proofs.  
+- **Low Fees & Instant Settlement:** Avoids SWIFT delays and remittance fees.
 
 **Best Fit:**  
-Retail ecosystems, airline rewards, and hospitality programs.
+Remittance companies using **P2P model (Scenario 5)**, or hybrid services with **vendor-assisted verification (Scenario 3)**.
 
 
 
-### **7. B2B Settlements & Supply Chain Payments**
+### **6. Loyalty and Reward Programs**  
+**Verifier Strategy:** **Scenario 2 (Vendor = Beneficiary)** or **Scenario 4 (Vendor Gateway)**  
 
 **Example Scenario:**  
-A manufacturer pays **€50,000 USDC** to a verified supplier.
+A retailer issues **USDC-based loyalty rewards** redeemable at partner stores.
 
 **Key Benefits:**  
-- **Instant Settlement:** Eliminates delays from cross-border bank transfers.  
-- **Verified Counterparty:** Supplier identity (legal entity) is confirmed via SD-JWT before transfer.  
-- **Audit-Ready:** Payment, `tx_hash`, and identity proofs are stored for compliance reporting.
+- **Fraud Prevention:** Rewards are bound to verified user identity (e.g., EUDI credentials).  
+- **Instant Redemption:** Users can spend or transfer tokens without intermediaries.  
+- **Turnkey Setup:** Vendor manages compliance and payments if merchants lack technical expertise.
 
 **Best Fit:**  
-Cross-border trade, supply chain payments, and enterprise settlements.
+Retail ecosystems **outsourcing custody & compliance to a vendor (Scenario 2/4)**.
 
 
-### **8. Tokenized Financial Products (Flagship Use Case)**
+
+### **7. B2B Settlements & Supply Chain Payments**  
+**Verifier Strategy:** **Scenario 1 (Self-Custody)**  
+
+**Example Scenario:**  
+A manufacturer pays **€50,000 USDC** to a verified supplier across borders.
+
+**Key Benefits:**  
+- **Instant Cross-Border Settlement:** No intermediary banks needed.  
+- **Legal Entity Verification:** Supplier’s corporate identity verified via SD-JWT.  
+- **Full Audit Compliance:** Transaction logs are tied to corporate KYC.
+
+**Best Fit:**  
+Enterprises with **in-house compliance teams and treasury management (Scenario 1)**.
+
+
+
+### **8. Tokenized Financial Products (Flagship Use Case)**  
+**Verifier Strategy:** **Scenario 1 (Bank as Verifier)**  
 
 **Example Scenario:**  
 A user buys **€10,000 of a tokenized bond** issued by a bank.
 
 **Key Benefits:**  
-- **Identity + Payment Binding:** EUDI wallet shares **KYC attributes** and links them to the **stablecoin payment (`tx_hash`)**.  
-- **Instant Settlement of Assets:** The bank issues **tokenized securities** directly to the user’s wallet after on-chain payment.  
-- **Compliance & Audit:** Full traceability for **MiCA and AMLD6**, with cryptographic binding of identity, payment, and token issuance.
+- **Payment + KYC Binding:** The EUDI wallet shares KYC claims and links them to the payment `tx_hash`.  
+- **Real-Time Settlement:** Stablecoin payment triggers instant token issuance.  
+- **Regulatory-Grade Proof:** All actions are logged per MiCA and AMLD6.
 
 **Best Fit:**  
-Banks and fintechs issuing **tokenized bonds, funds, or real-world assets**, bridging **traditional finance and Web3**.
+Banks or fintechs issuing tokenized securities or real-world assets (RWA) while **acting as both verifier and beneficiary**.
 
 
-### **Highlight: Why Tokenized Products are the Best Use Case**
 
-This wallet is particularly well-suited for **regulated tokenized products**, where **identity verification, instant payment, and asset transfer** must be **cryptographically linked**.
+### **Use Case ↔ Verifier Strategy Matrix**
 
-**Advantages:**
-- **Fast settlement (via stablecoins)**.  
-- **Seamless KYC compliance** (via EUDI + SD-JWT).  
-- **Auditable proofs** that satisfy **MiCA and TFR** obligations.
+| Use Case                               | Recommended Verifier Strategy |
+|----------------------------------------|-------------------------------|
+| **1. E-Commerce Payments**             | Scenario 1 or Scenario 3      |
+| **2. Banking & Institutional Services**| Scenario 1                    |
+| **3. Digital Identity-Linked Payments**| Scenario 1 or Scenario 3      |
+| **4. DeFi & Web3 Services**            | Scenario 5                    |
+| **5. Cross-Border Remittances**        | Scenario 5 or Scenario 3      |
+| **6. Loyalty & Reward Programs**       | Scenario 2 or Scenario 4      |
+| **7. B2B Settlements & Supply Chain**  | Scenario 1                    |
+| **8. Tokenized Financial Products**    | Scenario 1                    |
 
 
 ## Technical Steps for Payment Flow
@@ -766,158 +784,6 @@ Payload of the KB JWT attached to the Identity SD-JWT VC with `transaction_data_
   The hash of the unsigned blockchain transaction that will be broadcast.
   This binds the identity proof (SD-JWT VC) to a specific blockchain operation, enabling strong integrity and non-repudiation guarantees.
 
-## Verifier Implementation Strategies (Verifier, Vendor, and Beneficiary Roles)
-
-In the payment architecture, three roles can exist:
-
-- **Verifier** – The entity initiating and validating the OIDC4VP request and verifying SD-JWT and VP tokens.
-- **Beneficiary** – The final recipient of the funds (e.g., a merchant).
-- **Vendor** – A third-party service provider that can act as a verifier, hold the beneficiary’s wallet, or provide compliance and verification as a service.
-
-The **beneficiary wallet** is the blockchain wallet that receives the stablecoin transfer.  
-This wallet can be:
-- **Owned by the beneficiary** (self-custody), or
-- **Owned by a vendor** (custodial model).
-
-The verifier role may be:
-- Performed **entirely by the beneficiary**,
-- Delegated to the **vendor**, or
-- **Split between both**.
-
-Below are the **main implementation scenarios**.
-
-
-### **Scenario 1 – Verifier = Beneficiary (Self-Custody Model)**
-
-**Roles and Wallet Ownership:**
-- The **beneficiary acts as the verifier** and controls the beneficiary wallet.
-- All OIDC4VP requests are generated by the beneficiary.
-
-**How It Works:**
-- The beneficiary generates the `authorization_request` JWT (OIDC4VP).
-- The user’s wallet provides verifiable presentations (VP tokens and SD-JWT VCs).
-- The beneficiary validates the responses and directly receives stablecoins on its self-custody wallet.
-
-**Compliance (TFR & AML):**
-- The beneficiary must log:
-  - **Payer KYC attributes** (e.g., `given_name`, `family_name`, `birth_date` from the VP token).
-  - **Transaction metadata** (`amount`, `currency`, `tx_hash`, and timestamp).
-- Logs must be retained in compliance with **TFR** and **AMLD6** requirements.
-- **Not a CASP**, since the beneficiary only receives funds on its own wallet.
-
-**Use Case:**
-- Large merchants, financial institutions, or regulated businesses with their own compliance teams.
-
-
-### **Scenario 2 – Verifier = Vendor (Vendor as Beneficiary Wallet)**
-
-**Roles and Wallet Ownership:**
-- A **vendor acts as both verifier and beneficiary wallet owner**.
-- The vendor controls the wallet receiving the funds and manages OIDC4VP flows.
-
-**How It Works:**
-- Vendor issues the OIDC4VP request and validates the VP tokens.
-- Stablecoins are transferred from the user to the **vendor’s custodial wallet**.
-- Vendor later settles with the beneficiary (off-chain or by transferring stablecoins).
-
-**Compliance (TFR & AML):**
-- Vendor is responsible for:
-  - Collecting **payer KYC data** via VP tokens.
-  - Recording all transaction details (`amount`, `currency`, `tx_hash`, and timestamp).
-  - Reporting under **TFR** and AML regulations.
-- **Vendor acts as a CASP/VASP**, since it holds custody of user funds.
-
-**Use Case:**
-- Smaller or non-technical businesses that outsource both crypto handling and compliance.
-
-
-### **Scenario 3 – Split Role (Verifier = Vendor + Beneficiary)**
-
-**Roles and Wallet Ownership:**
-- The **verifier role is shared**:
-  - Vendor handles OIDC4VP request creation and session orchestration.
-  - Beneficiary owns the wallet receiving stablecoins and performs final data validation.
-
-**How It Works:**
-- Vendor issues the `authorization_request` JWT.
-- User’s wallet sends stablecoins **directly to the beneficiary wallet** (self-custody).
-- The OIDC4VP response (VP token and SD-JWT) is encrypted (JWE) so **only the beneficiary can access sensitive identity data**.
-- Vendor may log session metadata but not personal data.
-
-**Compliance (TFR & AML):**
-- Beneficiary is responsible for logging:
-  - **Payer KYC attributes** (from VP token).
-  - **Transaction data** (`tx_hash`, `amount`, etc.).
-- Vendor may log **non-sensitive metadata** (e.g., `nonce`, `state`) to provide audit traceability.
-- **Not a CASP**, since the vendor never holds funds.
-
-**Use Case:**
-- Businesses wanting vendor support for OIDC4VP integration while maintaining custody of funds and privacy.
-
-
-### **Scenario 4 – Vendor Gateway (Verifier and Wallet Fully Outsourced)**
-
-**Roles and Wallet Ownership:**
-- Vendor acts as both the **verifier and the beneficiary wallet owner**, managing the entire OIDC4VP and payment flow.
-
-**How It Works:**
-- Vendor generates the OIDC4VP request, verifies identity and blockchain proofs, and receives stablecoins on its custodial wallet.
-- Vendor provides a **payment confirmation callback** or webhook to the beneficiary.
-- Beneficiary does not directly interact with the blockchain.
-
-**Compliance (TFR & AML):**
-- Vendor logs and reports all **TFR-required data** and AML checks.
-- Beneficiary relies entirely on vendor reports for audits.
-- **Vendor is a CASP/VASP** (full custody).
-
-**Use Case:**
-- Businesses that require a "turnkey" crypto payment solution with fiat conversion.
-
-
-### **Scenario 5 – Peer-to-Peer Wallet (Verifier Separate, Wallets User-Controlled)**
-
-**Roles and Wallet Ownership:**
-- Both **user and beneficiary have self-custodial wallets**.
-- A verifier (beneficiary or a third-party vendor) only **validates compliance and identity proofs**, without holding funds.
-
-**How It Works:**
-- OIDC4VP flow is used to exchange identity data (VP tokens, SD-JWT VCs) and link it with the `tx_hash`.
-- Stablecoins are transferred **directly from user to beneficiary**.
-
-**Compliance (TFR & AML):**
-- Beneficiary logs:
-  - **Payer identity data** (from VP).
-  - Transaction data (`tx_hash`, `amount`, timestamp).
-- **No CASP** involved, since no third party holds funds.
-
-**Use Case:**
-- Decentralized, privacy-preserving payments with direct wallet-to-wallet transfers.
-
-
-### **Comparison Table**
-
-| Scenario                              | Verifier Role              | Beneficiary Wallet Owner | CASP/VASP Risk   | TFR Compliance Responsibility  |
-|---------------------------------------|----------------------------|--------------------------|------------------|--------------------------------|
-| **1. Verifier = Beneficiary**         | Beneficiary                | Beneficiary              | Low              | Beneficiary                    |
-| **2. Verifier = Vendor**              | Vendor                     | Vendor                   | Vendor = CASP    | Vendor                         |
-| **3. Split Role (Vendor + Beneficiary)** | Vendor + Beneficiary       | Beneficiary              | Low              | Beneficiary (Vendor logs meta) |
-| **4. Vendor Gateway**                 | Vendor                     | Vendor                   | Vendor = CASP    | Vendor                         |
-| **5. Peer-to-Peer Wallet**            | Beneficiary or Third-party | Beneficiary              | None             | Beneficiary                    |
-
-
-### **Regulatory Recommendations**
-
-- **For full privacy and compliance control:**  
-  - Use **Scenario 1 (Verifier = Beneficiary)** or **Scenario 3 (Split Model)**.  
-  - Both ensure the beneficiary directly controls the wallet and TFR records.
-
-- **For fast integration with minimal technical work:**  
-  - Use **Scenario 2 (Verifier = Vendor)** or **Scenario 4 (Vendor Gateway)**.  
-  - Ensure the vendor is **CASP-compliant** and AML reporting is contractually covered.
-
-- **For decentralized, CASP-free flows:**  
-  - Use **Scenario 5 (Peer-to-Peer Wallet)** with direct wallet-to-wallet transfers and OIDC4VP proofs for TFR data exchange.
-
 
 
 ## Security Considerations
@@ -1103,3 +969,155 @@ To comply with **MiCA** and the **EU Transfer of Funds Regulation (TFR)**, verif
    - Nonces (`nonce`) and session identifiers (`state`) used in the OIDC4VP request/response.
    - Results of verifier identity checks (e.g., trusted list validation).
    - Logs of consent confirmation (timestamp and authentication method such as biometric or PIN).
+
+### Verifier Implementation Strategies (Verifier, Vendor, and Beneficiary Roles)
+
+In the payment architecture, three roles can exist:
+
+- **Verifier** – The entity initiating and validating the OIDC4VP request and verifying SD-JWT and VP tokens.
+- **Beneficiary** – The final recipient of the funds (e.g., a merchant).
+- **Vendor** – A third-party service provider that can act as a verifier, hold the beneficiary’s wallet, or provide compliance and verification as a service.
+
+The **beneficiary wallet** is the blockchain wallet that receives the stablecoin transfer.  
+This wallet can be:
+- **Owned by the beneficiary** (self-custody), or
+- **Owned by a vendor** (custodial model).
+
+The verifier role may be:
+- Performed **entirely by the beneficiary**,
+- Delegated to the **vendor**, or
+- **Split between both**.
+
+Below are the **main implementation scenarios**.
+
+
+#### **Scenario 1 – Verifier = Beneficiary (Self-Custody Model)**
+
+**Roles and Wallet Ownership:**
+- The **beneficiary acts as the verifier** and controls the beneficiary wallet.
+- All OIDC4VP requests are generated by the beneficiary.
+
+**How It Works:**
+- The beneficiary generates the `authorization_request` JWT (OIDC4VP).
+- The user’s wallet provides verifiable presentations (VP tokens and SD-JWT VCs).
+- The beneficiary validates the responses and directly receives stablecoins on its self-custody wallet.
+
+**Compliance (TFR & AML):**
+- The beneficiary must log:
+  - **Payer KYC attributes** (e.g., `given_name`, `family_name`, `birth_date` from the VP token).
+  - **Transaction metadata** (`amount`, `currency`, `tx_hash`, and timestamp).
+- Logs must be retained in compliance with **TFR** and **AMLD6** requirements.
+- **Not a CASP**, since the beneficiary only receives funds on its own wallet.
+
+**Use Case:**
+- Large merchants, financial institutions, or regulated businesses with their own compliance teams.
+
+
+#### **Scenario 2 – Verifier = Vendor (Vendor as Beneficiary Wallet)**
+
+**Roles and Wallet Ownership:**
+- A **vendor acts as both verifier and beneficiary wallet owner**.
+- The vendor controls the wallet receiving the funds and manages OIDC4VP flows.
+
+**How It Works:**
+- Vendor issues the OIDC4VP request and validates the VP tokens.
+- Stablecoins are transferred from the user to the **vendor’s custodial wallet**.
+- Vendor later settles with the beneficiary (off-chain or by transferring stablecoins).
+
+**Compliance (TFR & AML):**
+- Vendor is responsible for:
+  - Collecting **payer KYC data** via VP tokens.
+  - Recording all transaction details (`amount`, `currency`, `tx_hash`, and timestamp).
+  - Reporting under **TFR** and AML regulations.
+- **Vendor acts as a CASP/VASP**, since it holds custody of user funds.
+
+**Use Case:**
+- Smaller or non-technical businesses that outsource both crypto handling and compliance.
+
+
+#### **Scenario 3 – Split Role (Verifier = Vendor + Beneficiary)**
+
+**Roles and Wallet Ownership:**
+- The **verifier role is shared**:
+  - Vendor handles OIDC4VP request creation and session orchestration.
+  - Beneficiary owns the wallet receiving stablecoins and performs final data validation.
+
+**How It Works:**
+- Vendor issues the `authorization_request` JWT.
+- User’s wallet sends stablecoins **directly to the beneficiary wallet** (self-custody).
+- The OIDC4VP response (VP token and SD-JWT) is encrypted (JWE) so **only the beneficiary can access sensitive identity data**.
+- Vendor may log session metadata but not personal data.
+
+**Compliance (TFR & AML):**
+- Beneficiary is responsible for logging:
+  - **Payer KYC attributes** (from VP token).
+  - **Transaction data** (`tx_hash`, `amount`, etc.).
+- Vendor may log **non-sensitive metadata** (e.g., `nonce`, `state`) to provide audit traceability.
+- **Not a CASP**, since the vendor never holds funds.
+
+**Use Case:**
+- Businesses wanting vendor support for OIDC4VP integration while maintaining custody of funds and privacy.
+
+
+#### **Scenario 4 – Vendor Gateway (Verifier and Wallet Fully Outsourced)**
+
+**Roles and Wallet Ownership:**
+- Vendor acts as both the **verifier and the beneficiary wallet owner**, managing the entire OIDC4VP and payment flow.
+
+**How It Works:**
+- Vendor generates the OIDC4VP request, verifies identity and blockchain proofs, and receives stablecoins on its custodial wallet.
+- Vendor provides a **payment confirmation callback** or webhook to the beneficiary.
+- Beneficiary does not directly interact with the blockchain.
+
+**Compliance (TFR & AML):**
+- Vendor logs and reports all **TFR-required data** and AML checks.
+- Beneficiary relies entirely on vendor reports for audits.
+- **Vendor is a CASP/VASP** (full custody).
+
+**Use Case:**
+- Businesses that require a "turnkey" crypto payment solution with fiat conversion.
+
+
+#### **Scenario 5 – Peer-to-Peer Wallet (Verifier Separate, Wallets User-Controlled)**
+
+**Roles and Wallet Ownership:**
+- Both **user and beneficiary have self-custodial wallets**.
+- A verifier (beneficiary or a third-party vendor) only **validates compliance and identity proofs**, without holding funds.
+
+**How It Works:**
+- OIDC4VP flow is used to exchange identity data (VP tokens, SD-JWT VCs) and link it with the `tx_hash`.
+- Stablecoins are transferred **directly from user to beneficiary**.
+
+**Compliance (TFR & AML):**
+- Beneficiary logs:
+  - **Payer identity data** (from VP).
+  - Transaction data (`tx_hash`, `amount`, timestamp).
+- **No CASP** involved, since no third party holds funds.
+
+**Use Case:**
+- Decentralized, privacy-preserving payments with direct wallet-to-wallet transfers.
+
+
+#### **Comparison Table**
+
+| Scenario                              | Verifier Role              | Beneficiary Wallet Owner | CASP/VASP Risk   | TFR Compliance Responsibility  |
+|---------------------------------------|----------------------------|--------------------------|------------------|--------------------------------|
+| **1. Verifier = Beneficiary**         | Beneficiary                | Beneficiary              | Low              | Beneficiary                    |
+| **2. Verifier = Vendor**              | Vendor                     | Vendor                   | Vendor = CASP    | Vendor                         |
+| **3. Split Role (Vendor + Beneficiary)** | Vendor + Beneficiary       | Beneficiary              | Low              | Beneficiary (Vendor logs meta) |
+| **4. Vendor Gateway**                 | Vendor                     | Vendor                   | Vendor = CASP    | Vendor                         |
+| **5. Peer-to-Peer Wallet**            | Beneficiary or Third-party | Beneficiary              | None             | Beneficiary                    |
+
+
+#### **Regulatory Recommendations**
+
+- **For full privacy and compliance control:**  
+  - Use **Scenario 1 (Verifier = Beneficiary)** or **Scenario 3 (Split Model)**.  
+  - Both ensure the beneficiary directly controls the wallet and TFR records.
+
+- **For fast integration with minimal technical work:**  
+  - Use **Scenario 2 (Verifier = Vendor)** or **Scenario 4 (Vendor Gateway)**.  
+  - Ensure the vendor is **CASP-compliant** and AML reporting is contractually covered.
+
+- **For decentralized, CASP-free flows:**  
+  - Use **Scenario 5 (Peer-to-Peer Wallet)** with direct wallet-to-wallet transfers and OIDC4VP proofs for TFR data exchange.
