@@ -633,7 +633,7 @@ Payload of the KB JWT attached to the Identity SD-JWT VC with `transaction_data_
   The hash of the unsigned blockchain transaction that will be broadcast.
   This binds the identity proof (SD-JWT VC) to a specific blockchain operation, enabling strong integrity and non-repudiation guarantees.
 
-## 7. Verifier Implementation Strategies (Verifier, Vendor, and Beneficiary Roles)
+## Verifier Implementation Strategies (Verifier, Vendor, and Beneficiary Roles)
 
 In the payment architecture, three roles can exist:
 
