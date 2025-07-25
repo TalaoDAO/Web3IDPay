@@ -84,17 +84,8 @@ The following table summarizes how the technical components address compliance r
 | Integrity and authenticity  | **Signed JWT requests** and **KB JWT responses**       |
 | Confidentiality             | **JWE encrypted responses**                            |
 
-### Use Cases
 
-This wallet profile supports a wide range of real-world scenarios, from retail payments to institutional services:
 
-1. **E-Commerce** – Users can pay for goods/services with stablecoins while sharing only minimal identity data for AML/KYC compliance.
-2. **Banking and Institutional Services** – Banks or financial institutions can offer high-value clients a **regulated crypto management experience**, allowing verified users to hold and transfer stablecoins while remaining fully compliant with AMLD6, MiCA, and national regulations.
-3. **Digital Identity-Linked Payments** – Combining verifiable identity (eIDAS 2.0, EUDI) with payments for scenarios like **age-restricted goods**, **ticketing**, or **government-related fees**, where identity confirmation is mandatory.
-4. **DeFi & Web3 Services** – Verifiable account ownership for lending, staking, or DAO participation, ensuring regulatory compliance for certain financial operations.
-5. **Cross-border Remittances** – Compliant, instant stablecoin transfers across jurisdictions with built-in audit trails.
-6. **Loyalty and Reward Programs** – Businesses can issue stablecoin-based rewards or vouchers tied to verifiable identity credentials, ensuring traceability and preventing fraud.
-7. **B2B Settlements and Supply Chain Payments** – Businesses can make fast, auditable stablecoin payments to verified suppliers, reducing settlement times and ensuring regulatory compliance.
 
 ### Standards and Technologies Used
 
@@ -134,6 +125,139 @@ This wallet profile builds upon several open standards and technologies to ensur
 
   - **QR Codes / Deep Links** – For wallet-verifier interaction.
   - **HTTP POST / direct_post.jwt** – For delivering encrypted VP responses.
+
+
+## Use Cases
+
+This wallet profile enables a **new generation of compliant, privacy-preserving stablecoin payments** by combining **EUDI-based identity credentials** with **self-custodial crypto transactions**. It covers both **consumer** and **institutional** scenarios where **identity verification and instant settlement** are equally important.
+
+
+
+### **1. E-Commerce Payments (Retail)**
+
+**Example Scenario:**  
+A user purchases electronics online and pays **100 USDC** directly to the merchant using a **self-custodial wallet**.
+
+**Key Benefits:**  
+- **Seamless Checkout:** Scanning a QR code launches the EUDI wallet, combining **payment authorization + identity verification** in a single step.  
+- **AML/KYC Compliance:** Shares **only minimal identity data** (e.g., age confirmation or name), via **selective disclosure (SD-JWT)**.  
+- **Faster Settlement:** On-chain stablecoin settlement avoids chargebacks and reduces transaction costs.
+
+**Best Fit:**  
+Merchants seeking **low-cost, instant global payments** with privacy-preserving KYC.
+
+
+
+### **2. Banking & Institutional Services**
+
+**Example Scenario:**  
+A private bank enables high-net-worth clients to transfer **EURC** while meeting MiCA and TFR obligations.
+
+**Key Benefits:**  
+- **Regulatory Compliance:** Clients present **verifiable KYC credentials** using **OIDC4VP** and **SD-JWT**, ensuring full AML checks.  
+- **Identity-Payment Binding:** Every transaction is cryptographically linked to identity proofs via **Key Binding JWTs**.  
+- **Non-Custodial Transfers:** Users hold funds in their own wallet; the bank only receives payments into its self-custody account, avoiding CASP obligations.
+
+**Best Fit:**  
+Banks and regulated entities that need **compliant crypto rails** and **real-time settlements**.
+
+
+
+### **3. Digital Identity-Linked Payments**
+
+**Example Scenario:**  
+A user buys **age-restricted event tickets** or pays for **government services** that require strong identity verification.
+
+**Key Benefits:**  
+- **One-Step Identity + Payment:** The wallet confirms identity and completes the payment in the same flow.  
+- **Selective Disclosure:** Only necessary attributes (e.g., "over 18") are shared, ensuring **GDPR compliance**.  
+- **Traceability:** Payments and identity claims are linked via **transaction hashes** for legal reporting.
+
+**Best Fit:**  
+Ticketing platforms, public sector payments, and regulated retailers.
+
+### **4. DeFi & Web3 Services**
+
+**Example Scenario:**  
+A DAO requires verified KYC for members participating in on-chain governance or staking.
+
+**Key Benefits:**  
+- **Proof of Verified User:** Users can present **KYC credentials** without revealing all personal data.  
+- **Ownership Proof:** Blockchain accounts are linked to user credentials via **blockchain ownership SD-JWT**.  
+- **Regulatory Gatekeeping:** Ensures compliance for DeFi protocols without sacrificing decentralization.
+
+**Best Fit:**  
+DeFi protocols, staking services, and DAOs with **compliance requirements**.
+
+
+
+### **5. Cross-Border Remittances**
+
+**Example Scenario:**  
+An individual in Germany sends **500 USDC** to family in the Philippines.
+
+**Key Benefits:**  
+- **Instant Transfers:** Stablecoin transactions avoid delays and high remittance fees.  
+- **Built-In KYC & TFR Compliance:** Each transaction includes **identity-linked proofs** for AML checks.  
+- **Auditability:** Wallet generates **verifiable payment receipts** with `tx_hash` and identity data hashes.
+
+**Best Fit:**  
+Remittance services and global payment gateways.
+
+
+
+### **6. Loyalty and Reward Programs**
+
+**Example Scenario:**  
+A retailer issues **stablecoin-based loyalty rewards** redeemable across its store network.
+
+**Key Benefits:**  
+- **Fraud Prevention:** Rewards are linked to **verified identities** to prevent abuse.  
+- **Instant Redemption:** Tokens can be spent or transferred on-chain instantly.  
+- **Cross-Vendor Interoperability:** Stablecoin rewards can integrate with multiple merchants.
+
+**Best Fit:**  
+Retail ecosystems, airline rewards, and hospitality programs.
+
+
+
+### **7. B2B Settlements & Supply Chain Payments**
+
+**Example Scenario:**  
+A manufacturer pays **€50,000 USDC** to a verified supplier.
+
+**Key Benefits:**  
+- **Instant Settlement:** Eliminates delays from cross-border bank transfers.  
+- **Verified Counterparty:** Supplier identity (legal entity) is confirmed via SD-JWT before transfer.  
+- **Audit-Ready:** Payment, `tx_hash`, and identity proofs are stored for compliance reporting.
+
+**Best Fit:**  
+Cross-border trade, supply chain payments, and enterprise settlements.
+
+
+### **8. Tokenized Financial Products (Flagship Use Case)**
+
+**Example Scenario:**  
+A user buys **€10,000 of a tokenized bond** issued by a bank.
+
+**Key Benefits:**  
+- **Identity + Payment Binding:** EUDI wallet shares **KYC attributes** and links them to the **stablecoin payment (`tx_hash`)**.  
+- **Instant Settlement of Assets:** The bank issues **tokenized securities** directly to the user’s wallet after on-chain payment.  
+- **Compliance & Audit:** Full traceability for **MiCA and AMLD6**, with cryptographic binding of identity, payment, and token issuance.
+
+**Best Fit:**  
+Banks and fintechs issuing **tokenized bonds, funds, or real-world assets**, bridging **traditional finance and Web3**.
+
+
+### **Highlight: Why Tokenized Products are the Best Use Case**
+
+This wallet is particularly well-suited for **regulated tokenized products**, where **identity verification, instant payment, and asset transfer** must be **cryptographically linked**.
+
+**Advantages:**
+- **Fast settlement (via stablecoins)**.  
+- **Seamless KYC compliance** (via EUDI + SD-JWT).  
+- **Auditable proofs** that satisfy **MiCA and TFR** obligations.
+
 
 ## Technical Steps for Payment Flow
 
