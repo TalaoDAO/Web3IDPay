@@ -17,7 +17,7 @@ The specification focuses on combining **OIDC4VP**, **Verifiable Credentials (VC
 ## 📄 Specification Documents
 
 - [**Stablecoin Payments with EUDI compliant wallet**](stablecoin_oidc4vp.md) – Full technical specification.
-- [**Use Cases and Implementation Strategies**](use_case_and_implementation_strategies_improved.md) – Practical scenarios and verifier strategy models.
+- [**Use Cases and Implementation Strategies**](use_case_and_implementation_strategies.md) – Practical scenarios and verifier strategy models.
 
 ---
 
