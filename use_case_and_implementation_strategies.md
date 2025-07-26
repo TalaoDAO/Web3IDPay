@@ -1,4 +1,4 @@
-# Use Cases and Implementation Strategies for Stablecoin Transfer with EUDI Compliant Wallet
+# Use Cases and Implementation Strategies for Stablecoin Transfers with EUDI Compliant Wallet
 
 - **Version**: 1.0
 - **Date**: 26th July 2025
@@ -40,7 +40,6 @@ The document focuses on two main aspects:
 1. **Use Cases and Implementation Strategies** – Practical applications of stablecoin transfers across different industries, with the best-fit verifier models.
 2. **Verifier Implementation Strategies** – How verifiers, vendors, and beneficiaries can be structured to ensure compliance, privacy, and operational flexibility.
 
----
 
 ## Use Cases
 
@@ -61,7 +60,6 @@ The entire flow happens in seconds without requiring the user to enter sensitive
 - **Scenario 1**: For large merchants managing their own compliance and self-custody wallet.
 - **Scenario 3**: For merchants relying on a **vendor** to handle OIDC4VP flows but keeping direct custody of funds.
 
----
 
 ### **2. Banking & Institutional Services**
 
@@ -79,7 +77,6 @@ The bank, acting as both verifier and beneficiary, receives the funds directly w
 
 - **Scenario 1**: Bank acts as both verifier and beneficiary, fully controlling compliance.
 
----
 
 ### **3. Digital Identity-Linked Payments**
 
@@ -98,7 +95,6 @@ The EUDI wallet verifies the user’s **age or citizenship** and processes the s
 - **Scenario 1**: For in-house verifier setups (retailers or government).
 - **Scenario 3**: For vendor-assisted OIDC4VP with beneficiary self-custody.
 
----
 
 ### **4. DeFi & Web3 Services**
 
@@ -116,7 +112,6 @@ Members use their EUDI wallet to provide **selective KYC credentials** while pro
 
 - **Scenario 5**: DAO or Web3 app operates as a verifier without holding funds.
 
----
 
 ### **5. Cross-Border Remittances**
 
@@ -135,7 +130,6 @@ The sender uses their EUDI wallet to share identity details and authorize the pa
 - **Scenario 5**: For direct wallet-to-wallet transfers.
 - **Scenario 3**: For hybrid services using vendor verification.
 
----
 
 ### **6. Loyalty and Reward Programs**
 
@@ -153,7 +147,6 @@ When a customer redeems points, their EUDI wallet verifies their identity, ensur
 
 - **Scenario 2 or 4**: Vendor manages verification, custody, and redemption.
 
----
 
 ### **7. B2B Settlements & Supply Chain Payments**
 
@@ -171,7 +164,6 @@ The supplier’s corporate identity is verified via SD-JWT, and the payment is s
 
 - **Scenario 1**: Both parties manage compliance and use self-custody wallets.
 
----
 
 ### **8. Tokenized Financial Products (Flagship Use Case)**
 
@@ -189,7 +181,6 @@ A customer pays **€10,000 USDC** through their EUDI wallet, simultaneously pre
 
 - **Scenario 1**: Bank acts as verifier and beneficiary with full control.
 
----
 
 ### **Use Case and Verifier Strategy Mapping**
 
@@ -207,9 +198,9 @@ A customer pays **€10,000 USDC** through their EUDI wallet, simultaneously pre
 
 ---
 
-## Verifier Roles and Implementation Models
+## Verifier Implementation Strategies
 
-In the payment architecture, three roles can exist:
+In the architecture, three roles can exist:
 
 - **Verifier** – The entity initiating and validating the OIDC4VP request and verifying SD-JWT and VP tokens.
 - **Beneficiary** – The final recipient of the funds (e.g., a merchant).

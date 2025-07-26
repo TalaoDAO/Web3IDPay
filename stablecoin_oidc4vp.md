@@ -1,48 +1,45 @@
-# Stablecoin Transfers with EUDI compatible Wallet
+# Stablecoin Transfers with EUDI compatible Crypto Wallet
 
 - **Version** : 1.7
 - **Date** : 26th July 2025
 - **Status** : Draft
 - **Maintainer** : Altme Identity & Compliance Team
+
 ## Table of Contents
 
 > **Note:** This document outlines the architecture and technical details of stablecoin payments using EUDI-compatible wallets.
 
-1. [Overview](#overview)  
-   - [Objectives](#objectives)  
-   - [Regulatory and Legal Context](#regulatory-and-legal-context)  
-   - [Compliance Mapping](#compliance-mapping)  
-   - [Standards and Technologies Used](#standards-and-technologies-used)  
-2. [Payment Flow](#payment-flow)  
-   - [Preconditions](#preconditions)  
-   - [Flow Steps](#flow-steps)  
-3. [Authorization Request from Verifier](#authorization-request-from-Verifier)  
-   - [Minimal SD-JWT VC for Identity](#1-minimal-identity-sd-jwt-vc-pid-like)  
-   - [SD-JWT VC for Blockchain Ownership](#2-sd-jwt-vc-for-blockchain-ownership)  
-   - [OIDC4VP Authorization Request Overview](#oidc4vp-authorization-request-overview)  
-   - [Transaction Data for Stablecoin Payment](#4-transaction-data-for-stablecoin-payment)  
-   - [Presentation Definition](#5-presentation-definition)  
-4. [Response from Wallet](#response-from-Wallet)  
-   - [Presentation Submission](#presentation-submission)  
-   - [VP Token](#vp-token)  
-   - [Key Binding JWT](#key-binding-jwt)  
-5. [Security Considerations](#security-considerations)  
-6. [Error Handling and Recovery](#error-handling-and-recovery)  
-7. [Annex](#annex)  
-   - [User Consent](#User-consent)  
-   - [Transaction Data](#transaction-data)  
-   
-
-
-
+1. [Overview](#overview)
+   - [Objectives](#objectives)
+   - [Regulatory and Legal Context](#regulatory-and-legal-context)
+   - [Compliance Mapping](#compliance-mapping)
+   - [Standards and Technologies Used](#standards-and-technologies-used)
+2. [Transfer Flow](#transfer-flow)
+   - [Preconditions](#preconditions)
+   - [Flow Steps](#flow-steps)
+3. [Authorization Request from Verifier](#authorization-request-from-Verifier)
+   - [Minimal SD-JWT VC for Identity](#1-minimal-identity-sd-jwt-vc-pid-like)
+   - [SD-JWT VC for Blockchain Ownership](#2-sd-jwt-vc-for-blockchain-ownership)
+   - [OIDC4VP Authorization Request Overview](#oidc4vp-authorization-request-overview)
+   - [Transaction Data for Stablecoin Transfer](#4-transaction-data-for-stablecoin-transfer)
+   - [Presentation Definition](#5-presentation-definition)
+4. [Response from Wallet](#response-from-Wallet)
+   - [Presentation Submission](#presentation-submission)
+   - [VP Token](#vp-token)
+   - [Key Binding JWT](#key-binding-jwt)
+5. [Security Considerations](#security-considerations)
+6. [Error Handling and Recovery](#error-handling-and-recovery)
+7. [Annex](#annex)
+   - [User Consent](#User-consent)
+   - [Transaction Data](#transaction-data)
 
 ## Overview
 
-This section provides a high-level description of the stablecoin payment architecture and its compliance with European regulations.
+This section provides a high-level description of the stablecoin transfer architecture and its compliance with European regulations.
 
 ### Objectives
 
-This document describes how **stablecoin payments** (e.g., **USDC**, **USDT**, **DAI**, **USDE**, **TUSD**) can be seamlessly supported using an **EUDI Wallet** or an equivalent **non-custodial data Wallet** that implements **OIDC4VP**, **Verifiable Credentials (VCs)**, and **digital asset transfer mechanisms**.
+This document describes how **stablecoin transfers** (e.g., **USDC**, **USDT**, **DAI**, **USDE**, **TUSD**) can be seamlessly supported using an **EUDI Wallet** or an equivalent **non-custodial data Wallet** that implements **OIDC4VP**, **Verifiable Credentials (VCs)**, and **digital asset transfer mechanisms**.
 
 For a detailed explanation of the **concept and motivation** behind this approach, see the Medium article:
 [The Future of Compliant Crypto in Europe – EUDI Wallets and Stablecoin Transfers](https://medium.com/@thierry.thevenet/the-future-of-compliant-crypto-in-europe-eudi-wallets-and-stablecoin-transfers-9d4c6c799c82)
@@ -51,7 +48,7 @@ Rather than introducing a new protocol, it defines a **Wallet profile** designed
 
 The key objectives are to:
 
-- **Enable secure, privacy-preserving, and User-consented payments** with stablecoins across **multiple blockchain networks** (Ethereum, Etherlink, Polygon, EVM-compatible chains).
+- **Enable secure, privacy-preserving, and User-consented transfers** with stablecoins across **multiple blockchain networks** (Ethereum, Etherlink, Polygon, EVM-compatible chains).
 - Use **cryptographic proofs** to verify blockchain address ownership in a **blockchain-agnostic** way.
 - Leverage **selective disclosure (SD-JWT VC)** to share only the minimum identity data required for **AML/KYC compliance**, ensuring **data minimization** as mandated by regulations like **GDPR**.
 - Guarantee **compliance with substantial assurance levels** for regulated digital asset transactions, including auditable logs and verifiable proofs of consent.
@@ -59,7 +56,7 @@ The key objectives are to:
 
 ### Regulatory and Legal Context
 
-The design of this Wallet profile aligns with current and upcoming **EU regulations** and global standards for digital payments:
+The design of this Wallet profile aligns with current and upcoming **EU regulations** and global standards for digital transfers:
 
 - **MiCA (Markets in Crypto-Assets Regulation)** – Ensures stablecoins (e.g., USDC, DAI) are issued and managed in a compliant framework.
 - **AMLD6 (6th Anti-Money Laundering Directive)** – Requires **identity verification (KYC)** and **transaction traceability** for digital assets.
@@ -81,9 +78,6 @@ The following table summarizes how the technical components address compliance r
 | Auditability                | **Transaction receipts** with `tx_hash`                |
 | Integrity and authenticity  | **Signed JWT requests** and **KB JWT responses**       |
 | Confidentiality             | **JWE encrypted responses**                            |
-
-
-
 
 ### Standards and Technologies Used
 
@@ -124,9 +118,7 @@ This Wallet profile builds upon several open standards and technologies to ensur
   - **QR Codes / Deep Links** – For Wallet-Verifier interaction.
   - **HTTP POST / direct_post.jwt** – For delivering encrypted VP responses.
 
-
-
-## Technical Steps for Payment Flow
+## Technical Steps for Transfer Flow
 
 ![](stablecoin_transfer_flow.png)
 
@@ -140,14 +132,14 @@ This Wallet profile builds upon several open standards and technologies to ensur
 
 #### **1.** User Interaction with Verifier
 
-The **User** initiates a payment by interacting with the **Verifier website** (e.g., clicking "Pay with Wallet").
+The **User** initiates a transfer by interacting with the **Verifier website** (e.g., clicking "Pay with Wallet").
 
 #### **2.** Authorization Request URI
 
 The **Verifier** generates a **signed OIDC4VP authorization request JWT at the request_uri endpoint**, which includes:
 
 - `nonce` and `state` attached to the session.
-- `transaction_data` (payment details like amount, currency, recipient address).
+- `transaction_data` (details like amount, currency, recipient address).
 - `presentation_definition` or `dcql_query` specifying the **required VCs** (identity VC and blockchain ownership VC).
 - `client_metadata` with the public key for encryption.
 - `response_mode=direct_post.jwt`
@@ -156,7 +148,7 @@ This request is encoded into a **QR code** or **deep link**, which the **User sc
 
 #### **3.** Wallet Fetches the Request Object
 
-The **Wallet** retrieves the **authorization request object as a signed JWT** (via a GET request) from the Verifier's endpoint to obtain the detailed payment and credential requirements.
+The **Wallet** retrieves the **authorization request object as a signed JWT** (via a GET request) from the Verifier's endpoint to obtain the detailed transaction data and credential requirements.
 
 #### **4.** Update Trusted List
 
@@ -388,7 +380,7 @@ Payload
 - **`iat`**
   Issued-at time, in Unix epoch format (seconds), indicating when the authorization request was generated.
 
-### **4.** Transaction Data for Stablecoin Payment
+### **4.** Transaction Data for Stablecoin Transfer
 
 In this example the payee is the Verifier identified by the `client_id` of the OIDC4VP request JWT.
 The transaction data must be BASE64 URL safe encoded before being added to the authorization request.
@@ -624,8 +616,6 @@ Payload of the KB JWT attached to the Identity SD-JWT VC with `transaction_data_
   The hash of the unsigned blockchain transaction that will be broadcast.
   This binds the identity proof (SD-JWT VC) to a specific blockchain operation, enabling strong integrity and non-repudiation guarantees.
 
-
-
 ## Security Considerations
 
 This section outlines the security principles and mechanisms ensuring the integrity, confidentiality, and compliance of transactions.
@@ -813,4 +803,3 @@ To comply with **MiCA** and the **EU Transfer of Funds Regulation (TFR)**, verif
    - Nonces (`nonce`) and session identifiers (`state`) used in the OIDC4VP request/response.
    - Results of Verifier identity checks (e.g., trusted list validation).
    - Logs of consent confirmation (timestamp and authentication method such as biometric or PIN).
-
