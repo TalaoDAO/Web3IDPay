@@ -1,223 +1,173 @@
-# Use Cases and Implementation Strategies for Stablecoin Transfers with EUDI Compliant Wallet
+# Use Cases and Implementation Strategies for Stablecoin Transfers with EUDI Compliant Crypto Wallet
 
 - **Version**: 1.0
-- **Date**: 26th July 2025
+- **Date**: 28th July 2025
 - **Status**: Draft
 - **Maintainer**: Altme Identity & Compliance Team
 
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Use Cases and Implementation Strategies](#use-cases-and-implementation-strategies)
-   - [E-Commerce Payments (Retail)](#1-e-commerce-payments-retail)
-   - [Banking & Institutional Services](#2-banking--institutional-services)
-   - [Digital Identity-Linked Payments](#3-digital-identity-linked-payments)
-   - [DeFi & Web3 Services](#4-defi--web3-services)
-   - [Cross-Border Remittances](#5-cross-border-remittances)
-   - [Loyalty and Reward Programs](#6-loyalty-and-reward-programs)
-   - [B2B Settlements & Supply Chain Payments](#7-b2b-settlements--supply-chain-payments)
-   - [Tokenized Financial Products (Flagship Use Case)](#8-tokenized-financial-products-flagship-use-case)
-   - [Use Case and Verifier Strategy Mapping](#use-case--verifier-strategy-matrix)
+2. [Use Cases](#use-cases)
+   1. [E-Commerce Payments (Retail)](#1-e-commerce-payments-retail)
+   2. [Banking & Institutional Services](#2-banking--institutional-services)
+   3. [Digital Identity-Linked Payments](#3-digital-identity-linked-payments)
+   4. [Cross-Border Remittances](#4-cross-border-remittances)
+   5. [Tokenized Financial Products (Flagship Use Case)](#5-tokenized-financial-products-flagship-use-case)
 3. [Verifier Implementation Strategies](#verifier-implementation-strategies)
-   - [Scenario 1 – Verifier = Beneficiary (Self-Custody Model)](#scenario-1--verifier--beneficiary-self-custody-model)
-   - [Scenario 2 – Verifier = Vendor (Vendor as Beneficiary Wallet)](#scenario-2--verifier--vendor-vendor-as-beneficiary-wallet)
-   - [Scenario 3 – Split Role (Verifier = Vendor + Beneficiary)](#scenario-3--split-role-verifier--vendor--beneficiary)
-   - [Scenario 4 – Vendor Gateway (Verifier and Wallet Fully Outsourced)](#scenario-4--vendor-gateway-verifier-and-wallet-fully-outsourced)
-   - [Scenario 5 – Peer-to-Peer Wallet (Verifier Separate, Wallets User-Controlled)](#scenario-5--peer-to-peer-wallet-verifier-separate-wallets-user-controlled)
-   - [Comparison Table](#comparison-table)
-   - [Regulatory Recommendations](#regulatory-recommendations)
-
----
+   1. [Key Roles](#1-key-roles)
+   2. [Wallet Models](#2-wallet-models)
+   3. [Compliance Delegation](#3-compliance-delegation)
+   4. [Implementation Scenarios](#4-implementation-scenarios)
+      - [Scenario 1 – Verifier = Beneficiary (Self-Custody Model)](#scenario-1--verifier--beneficiary-self-custody-model)
+      - [Scenario 2 – Verifier = Vendor (Vendor as Beneficiary Wallet)](#scenario-2--verifier--vendor-vendor-as-beneficiary-wallet)
+      - [Scenario 3 – Split Role (Verifier = Vendor + Beneficiary)](#scenario-3--split-role-verifier--vendor--beneficiary)
+      - [Scenario 4 – Peer-to-Peer Wallet (Fully Decentralized, No VASP)](#scenario-4--peer-to-peer-wallet-fully-decentralized-no-vasp)
+      - [Scenario 5 – Wallet as Endpoint of Notabene Network](#scenario-5--wallet-as-endpoint-of-notabene-network)
+      - [Scenario 6 – Wallet via VASP Proxy (Compliance Bridge)](#scenario-6--wallet-via-vasp-proxy-compliance-bridge)
+   5. [Comparison Table](#comparison-table)
+   6. [Regulatory Recommendations](#regulatory-recommendations)
 
 ## Introduction
 
-This document provides guidelines on how **stablecoin transfers** (e.g., **USDC**, **DAI**, **USDT**) can be executed in a **compliant and privacy-preserving manner** using an **EUDI-compatible wallet**.
+This document provides guidelines on how **stablecoin transfers** (e.g., **USDC**, **DAI**, **USDT**) can be executed in a **compliant and privacy-preserving manner** using an **EUDI-compatible crypto wallet**.
 
 By combining **EUDI identity credentials** with **self-custodial blockchain transactions**, these guidelines define secure and interoperable payment flows that meet **European regulations** (MiCA, TFR, AMLD6) while enabling **user consent, selective disclosure of identity attributes, and verifiable proofs** of transaction integrity.
 
 The document focuses on two main aspects:
 
-1. **Use Cases and Implementation Strategies** – Practical applications of stablecoin transfers across different industries, with the best-fit verifier models.
+1. **Use Cases** – Practical applications of stablecoin transfers across different industries, with the best-fit verifier models.
 2. **Verifier Implementation Strategies** – How verifiers, vendors, and beneficiaries can be structured to ensure compliance, privacy, and operational flexibility.
 
+## Use Cases
 
 ## Use Cases
 
 ### **1. E-Commerce Payments (Retail)**
 
 **Example Scenario:**
-A user buys a new laptop from an online electronics store. During checkout, they scan a QR code with their **EUDI-compatible wallet**, which simultaneously verifies their identity (e.g., age or name) and initiates a **100 USDC** stablecoin payment directly to the merchant’s wallet.
-The entire flow happens in seconds without requiring the user to enter sensitive payment details on the merchant’s website.
+A user buys a new laptop from an online electronics store. At checkout, they scan a QR code with their **EUDI-compliant crypto wallet**, which simultaneously verifies their identity (e.g., age or name) and initiates a **100 USDC stablecoin payment** directly to the merchant’s wallet. The merchant instantly receives the payment along with **cryptographic proof of the user’s identity attributes**—all without exposing sensitive data.
 
 **Key Benefits:**
 
-- **Seamless Checkout:** The QR code triggers the **EUDI wallet** for both payment and identity verification.
-- **AML/KYC Compliance:** Only essential data (e.g., name or age) is disclosed via **SD-JWT**.
-- **Fast Settlement:** Stablecoin transfers eliminate chargebacks and high card fees.
+- **Seamless Checkout:** A single QR code action handles both **payment and identity verification**.
+- **Privacy-Preserving Compliance:** Only essential attributes (e.g., “age > 18”) are shared using **SD-JWT selective disclosure**.
+- **Lower Costs:** Stablecoin payments **avoid chargebacks and card fees**.
+- **Built-In Compliance:** Merchants can connect with **Notabene APIs** for automated Travel Rule compliance.
 
 **Implementation Strategy:**
 
-- **Scenario 1**: For large merchants managing their own compliance and self-custody wallet.
-- **Scenario 3**: For merchants relying on a **vendor** to handle OIDC4VP flows but keeping direct custody of funds.
-
+- **Scenario 1:** Large merchants managing self-custody wallets and compliance directly.
+- **Scenario 3:** Merchants outsourcing OIDC4VP flows to a vendor while keeping custody of funds.
+- **Scenario 6:** Merchants using a **VASP proxy** for compliance automation.
 
 ### **2. Banking & Institutional Services**
 
 **Example Scenario:**
-A private bank offers high-net-worth clients the ability to invest in **tokenized bonds** or **deposit stablecoins**. A user initiates a payment from their self-custodial wallet, presenting **verifiable KYC credentials** during the process.
-The bank, acting as both verifier and beneficiary, receives the funds directly while ensuring all transactions are compliant with **MiCA and AMLD6** regulations.
+A private bank enables clients to invest in **tokenized bonds** or deposit stablecoins. Clients send funds from their **self-custodial wallet**, along with **verifiable KYC credentials**, to the bank’s smart contract address. The bank validates identity proofs and processes transactions under **MiCA and AMLD6 compliance**.
 
 **Key Benefits:**
 
-- **Regulatory Compliance:** The bank acts as verifier, receiving **KYC/AML proofs** directly from the wallet.
-- **Non-Custodial Transfers:** Users retain control of funds until payment settlement.
-- **Audit-Ready:** Every payment is linked to a verifiable proof (`tx_hash` + KB JWT).
+- **Full Compliance:** The bank receives **KYC/AML proofs** directly from the wallet.
+- **Non-Custodial User Experience:** Funds remain in user control until settlement.
+- **Audit-Ready Transactions:** Every payment is **linked to `tx_hash` and KYC data** for regulatory checks.
 
 **Implementation Strategy:**
 
-- **Scenario 1**: Bank acts as both verifier and beneficiary, fully controlling compliance.
-
+- **Scenario 1:** Bank acts as both verifier and beneficiary with complete compliance control.
+- **Scenario 5:** Banks integrate directly with **Notabene as a wallet endpoint** for cross-bank settlements.
 
 ### **3. Digital Identity-Linked Payments**
 
 **Example Scenario:**
-A user wants to purchase age-restricted goods, such as wine delivery, or pay for a government service requiring strong identity verification.
-The EUDI wallet verifies the user’s **age or citizenship** and processes the stablecoin payment in a single flow, disclosing only the required attributes (e.g., “age > 18”) without revealing sensitive personal information.
+A user pays for age-restricted goods (e.g., wine delivery) or a **government service requiring strong ID verification**. The wallet confirms the user’s **age or nationality** and processes the stablecoin payment, sharing **only the required attribute (e.g., “age > 18”)** while keeping sensitive data private.
 
 **Key Benefits:**
 
-- **Single Flow:** Payment and age verification happen in one step.
-- **Selective Disclosure:** Only “age over 18” is shared, **not full DOB**.
-- **Regulatory Traceability:** Payments are linked to disclosed attributes and `tx_hash`.
+- **Frictionless Flow:** Payment and ID verification are completed in a **single step**.
+- **Selective Disclosure:** Minimal data is exposed through **SD-JWT proofs**.
+- **Regulatory Traceability:** Transactions are linked to verifiable identity claims.
 
 **Implementation Strategy:**
 
-- **Scenario 1**: For in-house verifier setups (retailers or government).
-- **Scenario 3**: For vendor-assisted OIDC4VP with beneficiary self-custody.
+- **Scenario 1:** For agencies or merchants with in-house compliance.
+- **Scenario 3:** For vendor-managed OIDC4VP flows.
+- **Scenario 6:** When **VASP-based Travel Rule reporting** is needed.
 
-
-### **4. DeFi & Web3 Services**
+### **4. Cross-Border Remittances**
 
 **Example Scenario:**
-A decentralized autonomous organization (DAO) wants only verified users to participate in staking or voting.
-Members use their EUDI wallet to provide **selective KYC credentials** while proving ownership of their blockchain accounts, ensuring that only trusted, compliant participants can interact with the protocol.
+A worker in Germany sends **500 USDC** to family in the Philippines. The sender’s wallet attaches **encrypted identity attributes** for **TFR compliance**, and the recipient’s self-custodial wallet receives funds instantly.
 
 **Key Benefits:**
 
-- **Decentralized Verification:** The DAO acts as verifier but never touches user funds.
-- **Compliance Layer:** On-chain identity proofs (SD-JWT for account ownership) allow regulatory access control.
-- **Self-Custody:** Users sign payments and staking transactions themselves.
+- **No Intermediary Banks:** Payments avoid delays and high SWIFT fees.
+- **Travel Rule Compliance:** **Originator and beneficiary data** is securely exchanged.
+- **Instant Global Transfers:** Stablecoin rails provide **real-time settlement**.
 
 **Implementation Strategy:**
 
-- **Scenario 5**: DAO or Web3 app operates as a verifier without holding funds.
+- **Scenario 5:** Wallet integrates directly with Notabene as a **Travel Rule endpoint**.
+- **Scenario 6:** Wallet routes through a **VASP proxy** for regulatory messaging.
+- **Scenario 3:** Hybrid approach where a vendor validates identity while funds remain self-custodied.
 
-
-### **5. Cross-Border Remittances**
+### **5. Tokenized Financial Products (Flagship Use Case)**
 
 **Example Scenario:**
-A worker in Germany wants to send **500 USDC** to family in the Philippines without waiting days for a bank transfer.
-The sender uses their EUDI wallet to share identity details and authorize the payment, while the recipient instantly receives the funds in their self-custodial wallet, all in full compliance with EU TFR rules.
+A bank issues **tokenized bonds or real-world assets (RWA)**. An investor pays **€10,000 USDC** via an EUDI wallet while presenting **verifiable KYC credentials**. Upon payment confirmation, the bank **automatically issues the tokenized asset** to the investor’s wallet.
 
 **Key Benefits:**
 
-- **No Intermediary Custody:** Stablecoins move **P2P from sender to receiver**.
-- **Compliance by Design:** AML and TFR compliance ensured via SD-JWT & KB JWT proofs.
-- **Low Fees & Instant Settlement:** Avoids SWIFT delays and remittance fees.
+- **KYC + Payment Binding:** The payment is **cryptographically linked to the investor’s verified identity**.
+- **Instant Token Delivery:** **Stablecoin transfer triggers RWA issuance**.
+- **Regulatory Compliance:** Built-in **MiCA and AMLD6 proofs**.
 
 **Implementation Strategy:**
 
-- **Scenario 5**: For direct wallet-to-wallet transfers.
-- **Scenario 3**: For hybrid services using vendor verification.
-
-
-### **6. Loyalty and Reward Programs**
-
-**Example Scenario:**
-A retail chain issues **USDC-based loyalty points** that can be redeemed across all partner stores.
-When a customer redeems points, their EUDI wallet verifies their identity, ensuring the rewards are tied to legitimate accounts and cannot be fraudulently reused.
-
-**Key Benefits:**
-
-- **Fraud Prevention:** Rewards are bound to verified user identity (e.g., EUDI credentials).
-- **Instant Redemption:** Users can spend or transfer tokens without intermediaries.
-- **Turnkey Setup:** Vendor manages compliance and payments if merchants lack technical expertise.
-
-**Implementation Strategy:**
-
-- **Scenario 2 or 4**: Vendor manages verification, custody, and redemption.
-
-
-### **7. B2B Settlements & Supply Chain Payments**
-
-**Example Scenario:**
-A European manufacturer pays **€50,000 USDC** to an Asian supplier.
-The supplier’s corporate identity is verified via SD-JWT, and the payment is settled instantly on-chain, replacing the lengthy, expensive process of cross-border bank transfers.
-
-**Key Benefits:**
-
-- **Instant Cross-Border Settlement:** No intermediary banks needed.
-- **Legal Entity Verification:** Supplier’s corporate identity verified via SD-JWT.
-- **Full Audit Compliance:** Transaction logs are tied to corporate KYC.
-
-**Implementation Strategy:**
-
-- **Scenario 1**: Both parties manage compliance and use self-custody wallets.
-
-
-### **8. Tokenized Financial Products (Flagship Use Case)**
-
-**Example Scenario:**
-A bank offers tokenized bonds or real-world assets (RWA) to retail investors.
-A customer pays **€10,000 USDC** through their EUDI wallet, simultaneously presenting KYC credentials. Once the payment is confirmed, the bank issues the tokenized asset directly to the customer’s blockchain address.
-
-**Key Benefits:**
-
-- **Payment + KYC Binding:** The EUDI wallet shares KYC claims and links them to the payment `tx_hash`.
-- **Real-Time Settlement:** Stablecoin payment triggers instant token issuance.
-- **Regulatory-Grade Proof:** All actions are logged per MiCA and AMLD6.
-
-**Implementation Strategy:**
-
-- **Scenario 1**: Bank acts as verifier and beneficiary with full control.
-
-
-### **Use Case and Verifier Strategy Mapping**
-
-
-| Use Case                                | Recommended Verifier Strategy |
-| ----------------------------------------- | ------------------------------- |
-| **1. E-Commerce Payments**              | Scenario 1 or Scenario 3      |
-| **2. Banking & Institutional Services** | Scenario 1                    |
-| **3. Digital Identity-Linked Payments** | Scenario 1 or Scenario 3      |
-| **4. DeFi & Web3 Services**             | Scenario 5                    |
-| **5. Cross-Border Remittances**         | Scenario 5 or Scenario 3      |
-| **6. Loyalty & Reward Programs**        | Scenario 2 or Scenario 4      |
-| **7. B2B Settlements & Supply Chain**   | Scenario 1                    |
-| **8. Tokenized Financial Products**     | Scenario 1                    |
-
----
+- **Scenario 1:** Bank manages verification and custody directly.
+- **Scenario 5:** Bank integrates with Notabene for **cross-border asset issuance**.
 
 ## Verifier Implementation Strategies
 
-In the architecture, three roles can exist:
+This EUDI-compliant wallet supports multiple integration models for **identity verification, compliance, and stablecoin transfers**, depending on who manages compliance (beneficiary, vendor, or a VASP network).
 
-- **Verifier** – The entity initiating and validating the OIDC4VP request and verifying SD-JWT and VP tokens.
-- **Beneficiary** – The final recipient of the funds (e.g., a merchant).
-- **Vendor** – A third-party service provider that can act as a verifier, hold the beneficiary’s wallet, or provide compliance and verification as a service.
+### **1. Key Roles**
 
-The **beneficiary wallet** is the blockchain wallet that receives the stablecoin transfer.This wallet can be:
+- **Verifier:** Validates identity proofs (OIDC4VP, SD-JWT, VP tokens) before accepting payment.
+  *Example:* A bank verifying the sender’s KYC credentials.
+- **Beneficiary:** The recipient of funds (e.g., merchant, corporate, or bank).
+  *Example:* A retailer receiving 100 USDC in a self-custodial wallet.
+- **Vendor:** A third-party provider managing identity verification or custodial wallets for beneficiaries.
+- **VASP (Virtual Asset Service Provider):** A regulated entity (e.g., exchange or custodian) ensuring AML and Travel Rule compliance. Can connect directly to teh wallet or act as a proxy.
+- **Compliance Layer (e.g., Notabene):** A Travel Rule network linking VASPs.
 
-- **Owned by the beneficiary** (self-custody), or
-- **Owned by a vendor** (custodial model).
+  - The wallet can integrate **directly as an endpoint (Scenario 5)** or
+  - Use a **VASP proxy for compliance routing (Scenario 6)**.
 
-The verifier role may be:
+### **2. Wallet Models**
 
-- Performed **entirely by the beneficiary**,
-- Delegated to the **vendor**, or
-- **Split between both**.
+The **beneficiary wallet** may be:
 
-Below are the **main implementation scenarios**.
+- **Self-custodial** (owned by the beneficiary),
+- **Custodial** (hosted by a vendor),
+- **VASP-linked** (connected via Notabene).
+
+### **3. Compliance Delegation**
+
+The verifier role can be:
+
+- **Beneficiary-managed** (Scenario 1),
+- **Vendor-managed** (Scenario 2),
+- **Split between vendor and beneficiary** (Scenario 3), or
+- **Delegated to a VASP network/Notabene** (Scenarios 5 & 6).
+
+### **4. Implementation Scenarios**
+
+The following sections describe **the six main implementation scenarios**, with details on:
+
+- **Who acts as the verifier,**
+- **Who controls the wallet,**
+- **How Travel Rule and AML compliance are ensured.**
 
 ### **Scenario 1 – Verifier = Beneficiary (Self-Custody Model)**
 
@@ -229,8 +179,9 @@ Below are the **main implementation scenarios**.
 **How It Works:**
 
 - The beneficiary generates the `authorization_request` JWT (OIDC4VP).
-- The user’s wallet provides verifiable presentations (VP tokens and SD-JWT VCs).
+- The user’s EUDI wallet provides verifiable presentations (VP tokens and SD-JWT VCs).
 - The beneficiary validates the responses and directly receives stablecoins on its self-custody wallet.
+- Optionally, the beneficiary may integrate **Notabene as a direct API endpoint** to exchange Travel Rule data if cross-VASP compliance is needed.
 
 **Compliance (TFR & AML):**
 
@@ -242,7 +193,8 @@ Below are the **main implementation scenarios**.
 
 **Use Case:**
 
-- Large merchants, financial institutions, or regulated businesses with their own compliance teams.
+- Large merchants, financial institutions, or regulated businesses with internal compliance teams.
+
 
 ### **Scenario 2 – Verifier = Vendor (Vendor as Beneficiary Wallet)**
 
@@ -256,6 +208,7 @@ Below are the **main implementation scenarios**.
 - Vendor issues the OIDC4VP request and validates the VP tokens.
 - Stablecoins are transferred from the user to the **vendor’s custodial wallet**.
 - Vendor later settles with the beneficiary (off-chain or by transferring stablecoins).
+- Vendor can connect to **Notabene** to automate Travel Rule data exchange with other VASPs.
 
 **Compliance (TFR & AML):**
 
@@ -267,7 +220,8 @@ Below are the **main implementation scenarios**.
 
 **Use Case:**
 
-- Smaller or non-technical businesses that outsource both crypto handling and compliance.
+- Smaller or non-technical businesses that outsource crypto handling and compliance.
+
 
 ### **Scenario 3 – Split Role (Verifier = Vendor + Beneficiary)**
 
@@ -283,6 +237,7 @@ Below are the **main implementation scenarios**.
 - User’s wallet sends stablecoins **directly to the beneficiary wallet** (self-custody).
 - The OIDC4VP response (VP token and SD-JWT) is encrypted (JWE) so **only the beneficiary can access sensitive identity data**.
 - Vendor may log session metadata but not personal data.
+- If required, the vendor or beneficiary can connect to **Notabene as a VASP endpoint** for TFR compliance.
 
 **Compliance (TFR & AML):**
 
@@ -296,29 +251,8 @@ Below are the **main implementation scenarios**.
 
 - Businesses wanting vendor support for OIDC4VP integration while maintaining custody of funds and privacy.
 
-### **Scenario 4 – Vendor Gateway (Verifier and Wallet Fully Outsourced)**
 
-**Roles and Wallet Ownership:**
-
-- Vendor acts as both the **verifier and the beneficiary wallet owner**, managing the entire OIDC4VP and payment flow.
-
-**How It Works:**
-
-- Vendor generates the OIDC4VP request, verifies identity and blockchain proofs, and receives stablecoins on its custodial wallet.
-- Vendor provides a **payment confirmation callback** or webhook to the beneficiary.
-- Beneficiary does not directly interact with the blockchain.
-
-**Compliance (TFR & AML):**
-
-- Vendor logs and reports all **TFR-required data** and AML checks.
-- Beneficiary relies entirely on vendor reports for audits.
-- **Vendor is a CASP/VASP** (full custody).
-
-**Use Case:**
-
-- Businesses that require a "turnkey" crypto payment solution with fiat conversion.
-
-### **Scenario 5 – Peer-to-Peer Wallet (Verifier Separate, Wallets User-Controlled)**
+### **Scenario 4 – Peer-to-Peer Wallet (Fully Decentralized, No VASP)**
 
 **Roles and Wallet Ownership:**
 
@@ -329,39 +263,90 @@ Below are the **main implementation scenarios**.
 
 - OIDC4VP flow is used to exchange identity data (VP tokens, SD-JWT VCs) and link it with the `tx_hash`.
 - Stablecoins are transferred **directly from user to beneficiary**.
+- **No Notabene or VASP** is involved unless manually added for compliance.
 
 **Compliance (TFR & AML):**
 
 - Beneficiary logs:
   - **Payer identity data** (from VP).
   - Transaction data (`tx_hash`, `amount`, timestamp).
-- **No CASP** involved, since no third party holds funds.
+- **No CASP** involved.
 
 **Use Case:**
 
-- Decentralized, privacy-preserving payments with direct wallet-to-wallet transfers.
+- DeFi protocols, on-chain services, or **Web3-native flows** prioritizing self-custody and privacy.
+
+
+### **Scenario 5 – Wallet as Endpoint of Notabene Network**
+
+**Roles and Wallet Ownership:**
+
+- **The EUDI wallet itself is a direct participant in the Notabene network.**
+- The wallet integrates with **Notabene APIs** to handle Travel Rule data exchange.
+
+**How It Works:**
+
+1. The wallet initiates a payment and prepares **Travel Rule metadata** (e.g., originator data from SD-JWT).
+2. This data is **sent directly to Notabene**, which routes it to the receiving VASP or endpoint.
+3. Funds are transferred **directly wallet-to-wallet**, but compliance data flows via Notabene.
+
+**Compliance (TFR & AML):**
+
+- The wallet acts like a **"light VASP node"** and must implement AML/TFR data exchange logic.
+- PII is encrypted and transmitted via **Notabene’s SafePII** system.
+
+**Use Case:**
+
+- Advanced EUDI wallets or institutional crypto wallets that need **direct regulatory compliance** without intermediaries.
+
+
+### **Scenario 6 – Wallet via VASP Proxy (Compliance Bridge)**
+
+**Roles and Wallet Ownership:**
+
+- **The EUDI wallet remains self-custodial** for funds.
+- A **VASP acts as a compliance middleware**, relaying Travel Rule data to Notabene but **does not hold or manage the funds**.
+
+**How It Works:**
+
+1. The EUDI wallet executes the payment and shares SD-JWT credentials.
+2. The wallet calls the **VASP Proxy API**, which:
+   - Validates OIDC4VP proofs,
+   - Packages Travel Rule data,
+   - Sends it to the **Notabene network**.
+3. Funds are transferred **directly wallet-to-wallet**, while the **VASP proxy logs compliance metadata**.
+
+**Compliance (TFR & AML):**
+
+- The VASP ensures Travel Rule data exchange and logging.
+- The wallet stays **non-custodial** but gains **compliance interoperability** through the proxy.
+
+**Use Case:**
+
+- Wallets that want to remain **non-custodial** but need **compliance automation** for cross-border or regulated flows.
+
+
 
 ### **Comparison Table**
 
 
-| Scenario                                 | Verifier Role              | Beneficiary Wallet Owner | CASP/VASP Risk | TFR Compliance Responsibility  |
-| ------------------------------------------ | ---------------------------- | -------------------------- | ---------------- | -------------------------------- |
-| **1. Verifier = Beneficiary**            | Beneficiary                | Beneficiary              | Low            | Beneficiary                    |
-| **2. Verifier = Vendor**                 | Vendor                     | Vendor                   | Vendor = CASP  | Vendor                         |
-| **3. Split Role (Vendor + Beneficiary)** | Vendor + Beneficiary       | Beneficiary              | Low            | Beneficiary (Vendor logs meta) |
-| **4. Vendor Gateway**                    | Vendor                     | Vendor                   | Vendor = CASP  | Vendor                         |
-| **5. Peer-to-Peer Wallet**               | Beneficiary or Third-party | Beneficiary              | None           | Beneficiary                    |
+| Scenario                                 | Verifier Role              | Beneficiary Wallet Owner | CASP/VASP Risk   | TFR Compliance Responsibility  |
+| ------------------------------------------ | ---------------------------- | -------------------------- | ------------------ | -------------------------------- |
+| **1. Verifier = Beneficiary**            | Beneficiary                | Beneficiary              | Low              | Beneficiary                    |
+| **2. Verifier = Vendor**                 | Vendor                     | Vendor                   | Vendor = CASP    | Vendor                         |
+| **3. Split Role (Vendor + Beneficiary)** | Vendor + Beneficiary       | Beneficiary              | Low              | Beneficiary (Vendor logs meta) |
+| **4. Peer-to-Peer Wallet**               | Beneficiary or Third-party | Beneficiary              | None             | Beneficiary                    |
+| **5. Wallet as Endpoint (Notabene)**     | Wallet + Notabene          | Beneficiary              | Medium (as node) | Wallet (via Notabene APIs)     |
+| **6. Wallet via VASP Proxy**             | VASP (Compliance API)      | Beneficiary              | Low (no custody) | VASP Proxy                     |
+
+
 
 ### **Regulatory Recommendations**
 
-- **For full privacy and compliance control:**
-
-  - Use **Scenario 1 (Verifier = Beneficiary)** or **Scenario 3 (Split Model)**.
-  - Both ensure the beneficiary directly controls the wallet and TFR records.
-- **For fast integration with minimal technical work:**
-
-  - Use **Scenario 2 (Verifier = Vendor)** or **Scenario 4 (Vendor Gateway)**.
-  - Ensure the vendor is **CASP-compliant** and AML reporting is contractually covered.
-- **For decentralized, CASP-free flows:**
-
-  - Use **Scenario 5 (Peer-to-Peer Wallet)** with direct wallet-to-wallet transfers and OIDC4VP proofs for TFR data exchange.
+- **For advanced wallets with full compliance needs:**
+  Use **Scenario 5 (Wallet as Endpoint)** for direct Notabene integration.
+- **For self-custody wallets preferring simplicity:**
+  Use **Scenario 6 (VASP Proxy)** to delegate Travel Rule message handling.
+- **For decentralized Web3 flows:**
+  **Scenario 4 (Pure P2P)** is suitable but may not meet TFR obligations.
+- **Scenarios 1, 2, and 3** remain useful for **merchants, banks, and regulated institutions** with varying levels of vendor or self-hosted compliance.
