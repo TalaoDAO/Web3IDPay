@@ -1,7 +1,7 @@
 # Stablecoin Transfers with EUDI compatible Crypto Wallet
 
-- **Version** : 1.7
-- **Date** : 26th July 2025
+- **Version** : 1.8
+- **Date** : 29th July 2025
 - **Status** : Draft
 - **Maintainer** : Altme Identity & Compliance Team
 
@@ -22,7 +22,8 @@
    - [SD-JWT VC for Blockchain Ownership](#2-sd-jwt-vc-for-blockchain-ownership)
    - [OIDC4VP Authorization Request Overview](#oidc4vp-authorization-request-overview)
    - [Transaction Data for Stablecoin Transfer](#4-transaction-data-for-stablecoin-transfer)
-   - [Presentation Definition](#5-presentation-definition)
+   - [Presentation Definition Option](#5-presentation-definition-option)
+   - [Digital Credential Query Option](#6-digital-credential-query-option)
 4. [Response from Wallet](#response-from-Wallet)
    - [Presentation Submission](#presentation-submission)
    - [VP Token](#vp-token)
@@ -243,7 +244,7 @@ Payload
   "iss": "https://talao.co",
   "iat": 1734560000,
   "exp": 1739999999,
-  "VCT": "eu:europa:ec.eudi.pid.1",
+  "vct": "eu:europa:ec.eudi.pid.1",
   "given_name": "Alice",
   "family_name": "Doe",
   "birth_date": "1990-05-20",
@@ -286,7 +287,7 @@ Payload
 {
   "iss": "did:jwk:eyJrdHkiOiJFQyIsImNydiI6InNlY3AyNTZrMSIsIngiOiI1SmQ1QlNjMFRYOC4uLiIsInkiOiJMOTl1Zks1cENkVS4uLiJ9",
   "iat": 1734561000,
-  "VCT": "urn:dev:VCT:blockchain-ownership",
+  "vct": "urn:dev:vct:blockchain-ownership",
   "blockchain_network": "Ethereum",
   "wallet_address": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
   "cnf": {
@@ -343,6 +344,14 @@ Payload
           "y":"Hekpm0zfK7C-YccH5iBjcIXgf6YdUvNUac_0At55Okk"
         }
       ]
+    },
+    {
+      "vp_formats_supported": {
+        "dc+sd-jwt": {
+          "sd-jwt_alg_values": ["ES256"],
+          "kb-jwt_alg_values": ["ES256"]
+        }
+      }
     }
   },
   "exp": 1734567890,
@@ -367,13 +376,14 @@ Payload
   Protects against CSRF attacks.
 - **`nonce`**
   A unique value to prevent replay attacks and link the response to this request.
-- **`presentation_definition`**
+- **`presentation_definition`or `dcql_query`**
   A URL-encoded JSON structure defining the types of Verifiable Credentials (VCs) and claims the Verifier requires from the Wallet.
 - **`transaction_data`**
   A Base64 URL-encoded array of payment details, such as the amount, currency, payee, and purpose of the transaction.
 - **`client_metadata`** Metadata about the client, including the **JWKS** (JSON Web Key Set) used for encrypting the response from the Wallet.
 
   - **`keys`**: Contains public keys (e.g., EC keys on P-256 curve) used for ECDH key exchange.
+  - **`vp_formats_supported`**: Contains formats and algorithms supported for presentation.
 - **`exp`**
   Expiration time of the authorization request, in **Unix epoch** format (seconds).
   After this time, the request is invalid.
@@ -441,7 +451,7 @@ The transaction data must be BASE64 URL safe encoded before being added to the a
 - **`purpose`**
   A short description of the reason for the payment (e.g., `Purchase of digital goods`).
 
-### **5.** Presentation Definition
+### **5.** Presentation Definition Option
 
 The presentation definition must URL encoded before being added in the authorization request.
 
@@ -466,6 +476,15 @@ The presentation definition must URL encoded before being added in the authoriza
       "constraints": {
         "limit_disclosure": "required",
         "fields": [
+         {
+            "path": [
+              "$.vct"
+            ],
+            "filter": {
+              "type": "string",
+              "const": "eu:europa:ec.eudi.pid.1"
+            }
+          },
           { "path": ["$.given_name"]},
           { "path": ["$.family_name"]},
           { "path": ["$.birth_date"]}
@@ -489,6 +508,15 @@ The presentation definition must URL encoded before being added in the authoriza
       },
       "constraints": {
         "fields": [
+         {
+            "path": [
+              "$.vct"
+            ],
+            "filter": {
+              "type": "string",
+              "const": "urn:dev:vct:blockchain-ownership"
+            }
+          },
           { "path": ["$.blockchain_network"] },
           { "path": ["$.wallet_address"] }
         ]
@@ -496,6 +524,42 @@ The presentation definition must URL encoded before being added in the authoriza
     }
   ]
 }
+```
+
+### **6.** Digital Credential Query Option
+
+The Digital Credential Query must be URL encoded before being added in the authorization request.
+
+```json
+
+{
+  "credentials": [
+    {
+      "id": "eid-limited",
+      "format": "dc+sd-jwt",
+      "meta": {
+        "vct_values": ["eu:europa:ec.eudi.pid.1"]
+      },
+      "claims": [
+        {"path": ["given_name"]},
+        {"path": ["family_name"]},
+        {"path": ["birth_date"]}
+      ]
+    },
+    {
+      "id": "blockchain-ownership",
+      "format": "dc+sd-jwt",
+      "meta": {
+        "vct_value": "urn:dev:vct:blockchain-ownership"
+      },
+      "claims": [
+        {"path": ["blockchain_network"]},
+        {"path": ["wallet_address"]}
+      ]
+    }
+  ]
+}
+
 ```
 
 ## Response from Wallet
