@@ -1,7 +1,7 @@
-# Stablecoin Transfers with EUDI compatible Crypto Wallet
+# Crypto Transfers with EUDI compatible Crypto Wallet
 
-- **Version** : 1.8
-- **Date** : 29th July 2025
+- **Version** : 2.0
+- **Date** : 13th August 2025
 - **Status** : Draft
 - **Maintainer** : Altme Identity & Compliance Team
 
@@ -9,30 +9,40 @@
 
 > **Note:** This document outlines the architecture and technical details of stablecoin payments using EUDI-compatible wallets.
 
-1. [Overview](#overview)
-   - [Objectives](#objectives)
-   - [Regulatory and Legal Context](#regulatory-and-legal-context)
-   - [Compliance Mapping](#compliance-mapping)
-   - [Standards and Technologies Used](#standards-and-technologies-used)
-2. [Transfer Flow](#transfer-flow)
-   - [Preconditions](#preconditions)
-   - [Flow Steps](#flow-steps)
-3. [Authorization Request from Verifier](#authorization-request-from-Verifier)
-   - [Minimal SD-JWT VC for Identity](#1-minimal-identity-sd-jwt-vc-pid-like)
-   - [SD-JWT VC for Blockchain Ownership](#2-sd-jwt-vc-for-blockchain-ownership)
-   - [OIDC4VP Authorization Request Overview](#oidc4vp-authorization-request-overview)
-   - [Transaction Data for Stablecoin Transfer](#4-transaction-data-for-stablecoin-transfer)
-   - [Presentation Definition Option](#5-presentation-definition-option)
-   - [Digital Credential Query Option](#6-digital-credential-query-option)
-4. [Response from Wallet](#response-from-Wallet)
-   - [Presentation Submission](#presentation-submission)
-   - [VP Token](#vp-token)
-   - [Key Binding JWT](#key-binding-jwt)
-5. [Security Considerations](#security-considerations)
-6. [Error Handling and Recovery](#error-handling-and-recovery)
-7. [Annex](#annex)
-   - [User Consent](#User-consent)
-   - [Transaction Data](#transaction-data)
+- [Table of Contents](#table-of-contents)
+- [Overview](#overview)
+  - [Objectives](#objectives)
+  - [Regulatory and Legal Context](#regulatory-and-legal-context)
+  - [Compliance Mapping](#compliance-mapping)
+  - [Strategies to Associate Identity and Crypto Transactions](#strategies-to-associate-identity-and-crypto-transactions)
+  - [Standards and Technologies Used](#standards-and-technologies-used)
+  - [Interoperability Considerations](#interoperability-considerations)
+- [Technical Steps for Transfer Flow in a Embedded Transaction Data Approach](#technical-steps-for-transfer-flow-in-a-embedded-transaction-data-approach)
+  - [Preconditions](#preconditions)
+  - [Flow Steps](#flow-steps)
+- [Authorization request from Verifier](#authorization-request-from-verifier)
+  - [Minimal Identity SD-JWT VC (PID-like)](#minimal-identity-sd-jwt-vc-pid-like)
+  - [SD-JWT VC for Blockchain Ownership](#sd-jwt-vc-for-blockchain-ownership)
+  - [OIDC4VP Authorization Request Overview](#oidc4vp-authorization-request-overview)
+  - [Transaction Data Pattern for JSON-RPC Methods](#transaction-data-pattern-for-json-rpc-methods)
+  - [Presentation Definition Option](#presentation-definition-option)
+  - [Digital Credential Query Option](#digital-credential-query-option)
+- [Response from Wallet](#response-from-wallet)
+  - [Presentation Submission](#presentation-submission)
+  - [VP_token](#vp_token)
+  - [Key Binding JWT attached to the Identity SD-JWT VC](#key-binding-jwt-attached-to-the-identity-sd-jwt-vc)
+- [Security Considerations](#security-considerations)
+- [Error Handling and Recovery](#error-handling-and-recovery)
+  - [Authorization Request Failures](#authorization-request-failures)
+  - [User Consent Interruptions](#user-consent-interruptions)
+  - [OIDC4VP Response Errors](#oidc4vp-response-errors)
+  - [Blockchain Transaction Errors](#blockchain-transaction-errors)
+  - [Verifier Verification Errors](#verifier-verification-errors)
+  - [Post-Payment Discrepancies](#post-payment-discrepancies)
+  - [Audit and Incident Handling](#audit-and-incident-handling)
+- [Annex](#annex)
+  - [User consent](#user-consent)
+  - [Transaction data](#transaction-data)
 
 ## Overview
 
@@ -42,10 +52,18 @@ This section provides a high-level description of the stablecoin transfer archit
 
 This document describes how **stablecoin transfers** (e.g., **USDC**, **USDT**, **DAI**, **USDE**, **TUSD**) can be seamlessly supported using an **EUDI Wallet** or an equivalent **non-custodial data Wallet** that implements **OIDC4VP**, **Verifiable Credentials (VCs)**, and **digital asset transfer mechanisms**.
 
+> While stablecoin transfers are one of the most compelling near-term applications, the concepts in this document apply to **crypto transfers in general**.
+
 For a detailed explanation of the **concept and motivation** behind this approach, see the Medium article:
 [The Future of Compliant Crypto in Europe – EUDI Wallets and Stablecoin Transfers](https://medium.com/@thierry.thevenet/the-future-of-compliant-crypto-in-europe-eudi-wallets-and-stablecoin-transfers-9d4c6c799c82)
 
-Rather than introducing a new protocol, it defines a **Wallet profile** designed to ensure that **self-sovereign wallets** can comply with identity and digital transfer regulations (e.g., **MiCA**, **TFR**, **AMLD6**) while preserving User control and privacy.
+Rather than introducing a new protocol, it defines a **Wallet profile** designed to ensure that **self-sovereign wallets** can comply with identity and digital transfer regulations (e.g., **MiCA**, **TFR**, **AMLD6**) while preserving user control and privacy.
+
+In particular:
+
+- The **objective** is to use a **data wallet** like an EUDI Wallet to enhance crypto transfers by **relying on the wallet’s existing features**. The plan is to adapt crypto transfer flows to the data wallet, **not the other way around**.
+- This document proposes **different `transaction_data` patterns** adapted to crypto transfers, consistent with the OIDC4VP specification.
+- While the stablecoin use case is a priority, this document addresses **crypto transfers in general** as a broader design framework.
 
 The key objectives are to:
 
@@ -80,6 +98,79 @@ The following table summarizes how the technical components address compliance r
 | Integrity and authenticity  | **Signed JWT requests** and **KB JWT responses**       |
 | Confidentiality             | **JWE encrypted responses**                            |
 
+### Strategies to Associate Identity and Crypto Transactions
+
+In the context of compliant crypto transfers, there are two main architectural patterns for linking the **identity proof** (via OIDC4VP) and the **crypto payment** (via blockchain transaction). The choice between them impacts UX, complexity, and interoperability.
+
+#### 1. Embedded Transaction Data (One-Step Approach)
+
+In this model, the blockchain transfer details are **embedded directly inside** the `transaction_data` field of the OIDC4VP authorization request.This can include formats such as:
+
+- **EIP-681 payment URI** (e.g., `ethereum:0xabc...@1/transfer?address=0xdef...&uint256=1000000`)
+- **EIP-712 structured message** representing the payment intent
+- Raw blockchain transaction payload
+
+The identity wallet prepares the Verifiable Presentation **and** the payment request in the same flow, presenting both in a single user interaction.
+
+> **Note:** Even if the identity wallet does not directly support crypto transactions, it can still hand off the embedded payment request to a **separate crypto wallet** via:
+>
+> - Deeplink to the crypto wallet app
+> - Raw Ethereum URI (`ethereum:...`)
+> - WalletConnect request
+>   This keeps the apps separate while still initiating both steps from a single QR code scan.
+
+**Pros**
+
+- ✅ **Single QR code / deep link** → fewer user steps
+- ✅ **Single consent interaction** → identity disclosure and payment initiation happen together
+- ✅ Works with **either one app or two separate apps** (handoff from identity wallet to crypto wallet)
+- ✅ Strong binding: payment intent is cryptographically tied to identity proof (`transaction_data_hash` + `tx_hash`) in one package
+- ✅ Simpler for verifiers — only one request/response cycle
+
+**Cons**
+
+- ❌ Requires the identity wallet to implement the **handoff logic** to a crypto wallet
+- ❌ Less modular — identity proof cannot easily be reused independently of the payment
+- ❌ If either the identity or payment step fails, the whole process must be retried
+
+#### 2. Linked Transactions via Order ID (Two-Step Approach)
+
+In this model, the identity proof and blockchain payment are **performed separately**.An `order_id` (or equivalent unique transaction reference) is generated and included in **both**:
+
+1. The OIDC4VP transaction data (identity proof step)
+2. The crypto payment request (payment step)
+
+The verifier (or payment processor) uses the `order_id` to correlate the two events off-chain.
+
+**Flow example:**
+
+1. User scans QR code to provide OIDC4VP identity proof (wallet A)
+2. User signs & sends payment transaction (wallet B), passing the same `order_id` in the memo, extra data, or payment request metadata
+
+**Pros**
+
+- ✅ Works when identity and crypto wallets are **different apps/devices**
+- ✅ Maintains protocol separation — OIDC4VP for identity, EIP-1193/EIP-681 for payment
+- ✅ Easier to integrate with existing payment processors and wallet APIs
+
+**Cons**
+
+- ❌ Typically requires **two QR scans** or deep links (unless wallets integrate)
+- ❌ User has to approve twice (once for identity, once for payment)
+- ❌ Weaker on-chain binding — correlation relies on off-chain metadata (`order_id`), though identity proof can still be linked via cryptographic evidence if payment includes a signature
+
+#### Summary Table
+
+
+| Feature / Requirement   | Embedded (One-Step)                                    | Linked (Two-Step)                          |
+| ------------------------- | -------------------------------------------------------- | -------------------------------------------- |
+| **User interactions**   | 1 scan, 1 consent                                      | 2 scans, 2 consents                        |
+| **Wallet requirements** | Identity + Crypto**or** two separate apps with handoff | Can be separate                            |
+| **Binding strength**    | Cryptographic on-chain & off-chain                     | Mostly off-chain (unless extra signatures) |
+| **Protocol modularity** | Low                                                    | High                                       |
+| **Retry handling**      | All-or-nothing                                         | Independent steps                          |
+| **Ease for verifier**   | Simpler                                                | Requires correlation logic                 |
+
 ### Standards and Technologies Used
 
 This Wallet profile builds upon several open standards and technologies to ensure interoperability, security, and privacy:
@@ -108,18 +199,51 @@ This Wallet profile builds upon several open standards and technologies to ensur
   - **Encryption**: `AES-128-GCM` for symmetric encryption.
 - **Blockchain and Token Standards**
 
-  - **ERC-20** – Standard for stablecoins on Ethereum and EVM-compatible chains (e.g., USDC, DAI).
-  - **Multi-chain Support** – Ethereum mainnet, Etherlink, EVM-compatible chains, and others.
+  - **[ERC-20](https://eips.ethereum.org/EIPS/eip-20)** – Standard for fungible tokens and stablecoins on Ethereum and EVM-compatible chains (e.g., USDC, DAI).
+  - **[Ethereum URI Scheme (`ethereum:`)](https://eips.ethereum.org/EIPS/eip-681)** – Recognized by many wallets for initiating transactions from links or QR codes.
+  - **Multi-chain Support** – Ethereum mainnet, Etherlink, and other EVM-compatible chains.
+- **JSON-RPC Methods for Crypto Signing or Transfers**
+
+  - **`eth_sendTransaction`** – Standard RPC method for sending native or ERC-20 token transfers on-chain.
+  - **`eth_signTypedData_v4`** – RPC method for signing [EIP-712](https://eips.ethereum.org/EIPS/eip-712) structured data, typically for off-chain payment intents or agreements.
+  - **`personal_sign`** – RPC method for signing arbitrary messages (hex or UTF-8), often used for binding identity proofs to wallet ownership.
+  - **`evm.erc20_transfer.v1`** – Specialization of `eth_sendTransaction` for ERC-20 transfers using the `transfer(address,uint256)` function ABI.
+  - **[EIP-681](https://eips.ethereum.org/EIPS/eip-681)** – Ethereum Payment Request URI scheme; can be embedded in `transaction_data`, QR codes, or deep links to trigger wallet actions.
+- **Wallet Communication**
+
+  - **WalletConnect v2** – Open protocol for connecting dApps to crypto wallets, supporting both same-device and cross-device flows, transporting JSON-RPC calls securely.
+  - **Custom Deep Links** – App-specific URL schemes (e.g., `metamask://`) for handing off payment requests between identity and crypto wallets.
 - **Trust Infrastructure**
 
   - **Trusted Verifier Registry** – Ecosystem-managed **trusted list** of verifiers and issuers (based on **X.509 certificates**).
   - **client_id_scheme = x509_san_dns** – Required for verifying Verifier identity against the trusted list.
 - **Transport and Interaction**
 
-  - **QR Codes / Deep Links** – For Wallet-Verifier interaction.
+  - **QR Codes / Deep Links** – For Wallet-Verifier and Wallet-to-Wallet interaction (OIDC4VP, EIP-681, WalletConnect).
   - **HTTP POST / direct_post.jwt** – For delivering encrypted VP responses.
 
-## Technical Steps for Transfer Flow
+### Interoperability Considerations
+
+This profile is designed to be interoperable with widely adopted wallet interaction protocols and EVM-compatible environments.
+
+- **WalletConnect v2 Support**
+
+  - All JSON-RPC methods defined in this specification (`eth_sendTransaction`, `eth_signTypedData_v4`, `personal_sign`, `erc20_transfer.v1`) can be transmitted over [WalletConnect v2](https://walletconnect.com/), enabling cross-device and same-device flows.
+  - QR codes or deep links can be used to initiate a WalletConnect session from the Verifier to the Wallet.
+- **MetaMask and EVM-Compatible Wallets**
+
+  - The JSON-RPC patterns used are compatible with MetaMask, Coinbase Wallet, Trust Wallet, and other EVM-compatible wallets supporting [EIP-1193](https://eips.ethereum.org/EIPS/eip-1193) provider API.
+  - For wallets without native OIDC4VP support, the crypto transaction can still be triggered via a deep link containing `ethereum:` or EIP-681 URIs.
+- **EUDI Wallet Integration**
+
+  - In an **embedded transaction data** approach, a compliant EUDI Wallet can directly execute or delegate the JSON-RPC method to a linked crypto wallet.
+  - In a **two-step linked transaction** approach, the EUDI Wallet handles the identity proof (VP) and the crypto wallet performs the transaction, linked via `order_id`.
+- **Multi-Chain Compatibility**
+
+  - While the examples focus on Ethereum mainnet, the JSON-RPC methods are applicable to any EVM-compatible blockchain (e.g., Polygon, Binance Smart Chain, Avalanche, Etherlink).
+  - For non-EVM blockchains, equivalent RPC method mappings can be defined following the same `transaction_data` pattern.
+
+## Technical Steps for Transfer Flow in a Embedded Transaction Data Approach
 
 ![](stablecoin_transfer_flow.png)
 
@@ -218,7 +342,7 @@ To comply with **MiCA** and the **EU Transfer of Funds Regulation (TFR)**, verif
 
 ## Authorization request from Verifier
 
-### **1.** Minimal Identity SD-JWT VC (PID-like)
+### Minimal Identity SD-JWT VC (PID-like)
 
 This SD-JWT VC is is signed by the issuer of the Identity VC with a P-256 key and an x509 certificates attached in the header. The root certificate must be in the trusted list of the ecosystem. Claims are encoded and so are only disclosed with User consent.
 
@@ -262,7 +386,7 @@ Payload
 
 ---
 
-### **2.** SD-JWT VC for Blockchain Ownership
+### SD-JWT VC for Blockchain Ownership
 
 This **SD-JWT VC is signed by the key of the blockchain address** of the Wallet used to transfer the stable coins. The `cnf` is the Wallet key of the Identity SD-JWT VC of the User. Claims are readable (no disclosures needed).
 
@@ -390,68 +514,167 @@ Payload
 - **`iat`**
   Issued-at time, in Unix epoch format (seconds), indicating when the authorization request was generated.
 
-### **4.** Transaction Data for Stablecoin Transfer
+### Transaction Data Pattern for JSON-RPC Methods
 
-In this example the payee is the Verifier identified by the `client_id` of the OIDC4VP request JWT.
-The transaction data must be BASE64 URL safe encoded before being added to the authorization request.
+This profile defines a **transaction_data** format that supports both **on-chain transactions** (`eth_sendTransaction`) and **off-chain signed messages** (`eth_signTypedData_v4`, `personal_sign`), while complying with the [OIDC4VP transaction_data specification](https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#name-transaction-data).
+
+In case of an off-chain signed message, a second JSON-RPC method (`eth_sendTransaction`) could be added to the transastion data array to execute the transfer.
+
+#### 1. General Requirements from the OIDC4VP Spec
+
+- **transaction_data**: OPTIONAL.
+  A **non-empty array of strings**, where each string is a **base64url-encoded JSON object** containing a typed parameter set for the transaction the Verifier is requesting the End-User to authorize.
+- Each decoded object MUST include:
+  - **`type`**: REQUIRED. Example: `evm.eth_sendTransaction`, `evm.eth_signTypedData_v4`, `evm.personal_sign`.
+  - **`credential_ids`**: REQUIRED. Non-empty array of **DCQL Credential Query `id`** values referencing credentials that can authorize the transaction. If multiple IDs are present, the Wallet MUST use exactly one.
+  - Additional parameters as defined by the transaction data type.
+- The Wallet MUST reject the entire authorization request if **any** transaction data entry:
+  - Has an unknown `type`
+  - Does not conform to the type definition
+
+#### 2. Common Parameters for This Profile
+
+In addition to `type` and `credential_ids`, this profile supports optional parameters:
+
+
+| Parameter  | Type   | Description                              |
+| ------------ | -------- | ------------------------------------------ |
+| `ui_hints` | object | UI hints:`{ title, subtitle, icon_uri }` |
+
+#### 3. Supported JSON-RPC–Based Patterns
+
+##### **`evm.eth_sendTransaction`**
+
+Directly maps to the [EIP-1193 `eth_sendTransaction`](https://eips.ethereum.org/EIPS/eip-1193) method.
+
+**Parameters:**
+
+- **`rpc.method`** — REQUIRED. Must be `"eth_sendTransaction"`.
+- **`rpc.params`** — REQUIRED. An array with a single transaction object containing:
+  - `to`
+  - `value`
+  - optional `data`
+  - optional gas parameters
+
+**Wallet behavior:**
+
+- Complete OIDC4VP first.
+- Send the transaction via the connected wallet using JSON-RPC.
+- Always require user confirmation.
+
+**Example (simple ETH transfer):**
 
 ```json
 {
-  "type": "stablecoin_payment",
-  "credential_ids": ["eid-limited"],
-  "amount": {
-    "currency": "USDC",
-    "value": "100.00"
-  },
-  "token": {
-    "symbol": "USDC",
-    "contract_address": "0xA0b86991c6218B36c1d19D4a2e9Eb0cE3606eB48",
-    "decimals": 6
-  },
-  "network": {
-    "name": "Ethereum",
-    "chain_id": 1
-  },
-  "payee": {
-    "name": "ACME Store",
-    "wallet_address": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
-  },
-  "transaction_id": "1234567890",
-  "timestamp": "2025-07-18T14:30:00Z",
-  "purpose": "Purchase of digital goods"
+  "type": "evm.eth_sendTransaction",
+  "credential_ids": ["eid_limited"],
+  "ui_hints": { "title": "Pay 1 ETH to ACME", "subtitle": "Order ORD-001" },
+  "rpc": {
+    "method": "eth_sendTransaction",
+    "params": [{
+      "to": "0x9c2b00000000000000000000000000000000dEAD",
+      "value": "0xDE0B6B3A7640000"
+    }]
+  }
 }
 ```
 
-- **`type`**
-  Specifies the type of transaction.
-  In this case, it is `"stablecoin_payment"`.
-- **`credential_ids`**
-  Identifiers of the Verifiable Credentials required or linked to the payment (e.g., `"eid-limited"`).
-- **`amount`** Describes the payment amount and currency:
+**Example (USDC transfer 50.0):**
 
-  - **`currency`** – The stablecoin currency code (e.g., `USDC`).
-  - **`value`** – The payment amount as a string with decimals.
-- **`token`** Details of the stablecoin token contract:
+```json
+{
+  "type": "evm.erc20_transfer",
+  "credential_ids": ["eid_limited"],
+  "ui_hints": { "title": "Transfer 50 USDC", "subtitle": "Order ORD-004" },
+  "rpc": {
+    "method": "eth_sendTransaction",
+    "params": [{
+      "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "value": "0x0",
+      "data": "0xa9059cbb0000000000000000000000001111111111111111111111111111111111111111\
+0000000000000000000000000000000000000000000000000000000002faf080"
+    }]
+  }
+}
 
-  - **`symbol`** – Token symbol (e.g., `USDC`).
-  - **`contract_address`** – The contract address of the token on the blockchain (EVM format).
-  - **`decimals`** – Number of decimal places used by the token.
-- **`network`** Describes the blockchain network where the payment occurs:
+```
 
-  - **`name`** – Human-readable name (e.g., `Ethereum`).
-  - **`chain_id`** – Numeric chain identifier for the network.
-- **`payee`** Information about the Verifier or recipient of the payment:
+##### **`evm.eth_signTypedData_v4`**
 
-  - **`name`** – Verifier name (e.g., `ACME Store`).
-  - **`wallet_address`** – Blockchain Wallet address of the Verifier (EVM format).
-- **`transaction_id`**
-  An internal reference identifier for the payment, not to be confused with the on-chain `tx_hash`.
-- **`timestamp`**
-  The date and time when the transaction request was generated, in **ISO 8601** format.
-- **`purpose`**
-  A short description of the reason for the payment (e.g., `Purchase of digital goods`).
+Maps to the [EIP-712](https://eips.ethereum.org/EIPS/eip-712) / [EIP-1193 `eth_signTypedData_v4`](https://eips.ethereum.org/EIPS/eip-1193) method.
 
-### **5.** Presentation Definition Option
+**Parameters:**
+
+- **`rpc.method`** — REQUIRED. Must be `"evm.eth_signTypedData_v4"`.
+- **`rpc.params`** — REQUIRED. Two elements:
+  1. The signing address
+  2. The full EIP-712 typed data object
+
+**Wallet behavior:**
+
+- Complete **OIDC4VP** first.
+- Sign the typed data and return the signature; **do not broadcast** on-chain.
+- Typical usage: **off-chain payment intents**, **order approvals**.
+
+**Profile rule**If `rpc.params[0] === "__auto__"`, the wallet **MUST** replace it with:
+
+1) The account proven by a **Crypto Account Binding VC** among `credential_ids`, or
+2) Otherwise the wallet’s **currently selected account** for the declared `chain_id`.
+
+**Verifier check**
+Recover the signer from the returned signature and verify it matches the address in the binding VC (if provided).
+
+**Example**
+
+```json
+{
+  "type": "evm.eth_signTypedData_v4",
+  "credential_ids": ["kyc_vc", "account_binding_vc"],
+  "ui_hints": { "title": "Authorize payment intent", "subtitle": "Order ORD-003" },
+  "rpc": {
+    "method": "eth_signTypedData_v4",
+    "params": [
+      "__auto__",
+      {
+        "types": {
+          "EIP712Domain": [
+            { "name": "name", "type": "string"  },
+            { "name": "version", "type": "string"  },
+            { "name": "chainId", "type": "uint256" },
+            { "name": "verifyingContract", "type": "address" }
+          ],
+          "PaymentIntent": [
+            { "name": "order_id",  "type": "string"  },
+            { "name": "recipient", "type": "address" },
+            { "name": "token",     "type": "address" },
+            { "name": "amount",    "type": "uint256" },
+            { "name": "deadline",  "type": "uint256" }
+          ]
+        },
+        "primaryType": "PaymentIntent",
+        "domain": {
+          "name": "Web3IDPay",
+          "version": "1",
+          "chainId": 1,
+          "verifyingContract": "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"
+        },
+        "message": {
+          "order_id": "ORD-003",
+          "recipient": "0x1111111111111111111111111111111111111111",
+          "token":     "0x0000000000000000000000000000000000000000",
+          "amount":    "500000000000000000",
+          "deadline":  1924992000
+        }
+      }
+    ]
+  }
+}
+
+```
+
+In this case a **hex-encoded ECDSA signature** of the EIP-712 typed data. (with EVM signature and not JOSE signature) should be returned in the KB of the wallet presentation.
+
+### Presentation Definition Option
 
 The presentation definition must URL encoded before being added in the authorization request.
 
@@ -526,7 +749,7 @@ The presentation definition must URL encoded before being added in the authoriza
 }
 ```
 
-### **6.** Digital Credential Query Option
+### Digital Credential Query Option
 
 The Digital Credential Query must be URL encoded before being added in the authorization request.
 
@@ -716,7 +939,7 @@ This section provides strategies to handle potential errors and ensure smooth pa
 
 Stablecoin payments involve multiple steps, cryptographic exchanges, and interactions with both the Wallet and blockchain networks. To ensure reliability and regulatory compliance, the Wallet profile must define **error-handling procedures** for common failure scenarios.
 
-### **1.** Authorization Request Failures
+### Authorization Request Failures
 
 **Potential Issues:**
 
@@ -730,7 +953,7 @@ Stablecoin payments involve multiple steps, cryptographic exchanges, and interac
 - **User notification:** Show a clear error message (e.g., *“The payment request cannot be verified. Please try again or contact the Verifier.”*).
 - **Retry logic:** For transient network errors, retry fetching the `request_uri` up to 3 times with exponential backoff.
 
-### **2.** User Consent Interruptions
+### User Consent Interruptions
 
 **Potential Issues:**
 
@@ -743,7 +966,7 @@ Stablecoin payments involve multiple steps, cryptographic exchanges, and interac
 - The Wallet should log the incomplete attempt for audit purposes without storing sensitive data.
 - Allow the User to re-initiate payment by rescanning the QR code or refreshing the Verifier checkout page.
 
-### **3.** OIDC4VP Response Errors
+### OIDC4VP Response Errors
 
 **Potential Issues:**
 
@@ -756,7 +979,7 @@ Stablecoin payments involve multiple steps, cryptographic exchanges, and interac
 - **Store pending VP responses** for a short duration (e.g., 5 minutes) with strict encryption in the Wallet. Allow the User to retry manually.
 - If the JWE encryption fails due to an invalid `client_metadata`, notify the User and abort. The Verifier must regenerate the authorization request.
 
-### **4.** Blockchain Transaction Errors
+### Blockchain Transaction Errors
 
 **Potential Issues:**
 
@@ -771,7 +994,7 @@ Stablecoin payments involve multiple steps, cryptographic exchanges, and interac
 - Generate a **new `tx_hash`** if the transaction must be re-signed and re-broadcast.
 - Log all failed attempts (with reason) in an **audit-safe record**.
 
-### **5.** Verifier Verification Errors
+### Verifier Verification Errors
 
 **Potential Issues:**
 
@@ -783,7 +1006,7 @@ Stablecoin payments involve multiple steps, cryptographic exchanges, and interac
 - The Wallet must **re-fetch the trusted list** if verification fails and prompt the User if the Verifier is untrusted.
 - Provide the User with a **“safe exit”** option (cancel payment and return to Verifier).
 
-### **6.** Post-Payment Discrepancies
+### Post-Payment Discrepancies
 
 **Potential Issues:**
 
@@ -795,7 +1018,7 @@ Stablecoin payments involve multiple steps, cryptographic exchanges, and interac
 - The Wallet should monitor the blockchain for confirmation of the `tx_hash` and allow the User to **resend the VP proof** (if needed).
 - Generate an **immutable payment receipt** (with `tx_hash`, `transaction_data_hash`, and timestamp) so the User can prove payment later.
 
-### **7.** Audit and Incident Handling
+### Audit and Incident Handling
 
 - **Error Logging:** Every failure event (e.g., rejected VPs, failed broadcasts) must be logged locally and tied to a session identifier for debugging and compliance.
 - **Regulatory Reporting:** Serious errors (e.g., failed AML/KYC checks) must be escalated according to AMLD6 reporting obligations.
