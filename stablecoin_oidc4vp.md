@@ -7,7 +7,7 @@
 
 ## Table of Contents
 
-> **Note:** This document outlines the architecture and technical details of stablecoin payments using EUDI-compatible wallets.
+> **Note:** This document outlines the architecture and technical details of crypto payments using EUDI-compatible wallets.
 
 - [Table of Contents](#table-of-contents)
 - [Overview](#overview)
@@ -43,16 +43,15 @@
 - [Annex](#annex)
   - [User consent](#user-consent)
   - [Transaction data](#transaction-data)
+  - [Minimum Wallet Crypto & Chain Capabilities](minimum-wallet-crypto-&-chain-capabilities)
 
 ## Overview
 
-This section provides a high-level description of the stablecoin transfer architecture and its compliance with European regulations.
+This section provides a high-level description of the crypto transfer architecture and its compliance with European regulations.
 
 ### Objectives
 
-This document describes how **stablecoin transfers** (e.g., **USDC**, **USDT**, **DAI**, **USDE**, **TUSD**) can be seamlessly supported using an **EUDI Wallet** or an equivalent **non-custodial data Wallet** that implements **OIDC4VP**, **Verifiable Credentials (VCs)**, and **digital asset transfer mechanisms**.
-
-> While stablecoin transfers are one of the most compelling near-term applications, the concepts in this document apply to **crypto transfers in general**.
+This document describes how **cryptos and stablecoin transfers** (e.g., **USDC**, **USDT**, **DAI**, **USDE**, **TUSD**) can be seamlessly supported using an **EUDI Wallet** or an equivalent **non-custodial data Wallet** that implements **OIDC4VP**, **Verifiable Credentials (VCs)**, and **digital asset transfer mechanisms**.
 
 For a detailed explanation of the **concept and motivation** behind this approach, see the Medium article:
 [The Future of Compliant Crypto in Europe – EUDI Wallets and Stablecoin Transfers](https://medium.com/@thierry.thevenet/the-future-of-compliant-crypto-in-europe-eudi-wallets-and-stablecoin-transfers-9d4c6c799c82)
@@ -67,7 +66,7 @@ In particular:
 
 The key objectives are to:
 
-- **Enable secure, privacy-preserving, and User-consented transfers** with stablecoins across **multiple blockchain networks** (Ethereum, Etherlink, Polygon, EVM-compatible chains).
+- **Enable secure, privacy-preserving, and User-consented transfers** with cryptos across **multiple blockchain networks** (Ethereum, Etherlink, Polygon, EVM-compatible chains).
 - Use **cryptographic proofs** to verify blockchain address ownership in a **blockchain-agnostic** way.
 - Leverage **selective disclosure (SD-JWT VC)** to share only the minimum identity data required for **AML/KYC compliance**, ensuring **data minimization** as mandated by regulations like **GDPR**.
 - Guarantee **compliance with substantial assurance levels** for regulated digital asset transactions, including auditable logs and verifiable proofs of consent.
@@ -77,7 +76,7 @@ The key objectives are to:
 
 The design of this Wallet profile aligns with current and upcoming **EU regulations** and global standards for digital transfers:
 
-- **MiCA (Markets in Crypto-Assets Regulation)** – Ensures stablecoins (e.g., USDC, DAI) are issued and managed in a compliant framework.
+- **MiCA (Markets in Crypto-Assets Regulation)** – Ensures cryptos (e.g., USDC, DAI) are issued and managed in a compliant framework.
 - **AMLD6 (6th Anti-Money Laundering Directive)** – Requires **identity verification (KYC)** and **transaction traceability** for digital assets.
 - **DAC8 (EU Directive on Administrative Cooperation)** – Imposes **reporting obligations** for crypto transactions across EU states.
 - **eIDAS 2.0 & EUDI Wallets** – Provides a **standardized digital identity framework** and supports **Verifiable Credentials** for cross-border identity verification.
@@ -199,7 +198,7 @@ This Wallet profile builds upon several open standards and technologies to ensur
   - **Encryption**: `AES-128-GCM` for symmetric encryption.
 - **Blockchain and Token Standards**
 
-  - **[ERC-20](https://eips.ethereum.org/EIPS/eip-20)** – Standard for fungible tokens and stablecoins on Ethereum and EVM-compatible chains (e.g., USDC, DAI).
+  - **[ERC-20](https://eips.ethereum.org/EIPS/eip-20)** – Standard for fungible tokens and cryptos on Ethereum and EVM-compatible chains (e.g., USDC, DAI).
   - **[Ethereum URI Scheme (`ethereum:`)](https://eips.ethereum.org/EIPS/eip-681)** – Recognized by many wallets for initiating transactions from links or QR codes.
   - **Multi-chain Support** – Ethereum mainnet, Etherlink, and other EVM-compatible chains.
 - **JSON-RPC Methods for Crypto Signing or Transfers**
@@ -326,7 +325,7 @@ Upon success, it responds with:
 
 #### **11.** Blockchain Transaction Broadcast
 
-Upon receiving the 200 OK, the **Wallet** signs and broadcasts the **stablecoin transfer** on the blockchain network.
+Upon receiving the 200 OK, the **Wallet** signs and broadcasts the **crypto transfer** on the blockchain network.
 
 #### **12.** Redirect to Success URI
 
@@ -338,7 +337,7 @@ The **Verifier** displays a **success page** to the User, confirming the payment
 
 #### **14.** Store Transaction Data
 
-To comply with **MiCA** and the **EU Transfer of Funds Regulation (TFR)**, verifiers and users must retain specific transaction data for auditability, AML/KYC checks, and regulatory reporting. Logging ensures that each stablecoin payment can be traced back to its source, with all required identity attributes preserved. See Annex.
+To comply with **MiCA** and the **EU Transfer of Funds Regulation (TFR)**, verifiers and users must retain specific transaction data for auditability, AML/KYC checks, and regulatory reporting. Logging ensures that each crypto payment can be traced back to its source, with all required identity attributes preserved. See Annex.
 
 ## Authorization request from Verifier
 
@@ -568,33 +567,103 @@ Directly maps to the [EIP-1193 `eth_sendTransaction`](https://eips.ethereum.org/
 {
   "type": "evm.eth_sendTransaction",
   "credential_ids": ["eid_limited"],
-  "ui_hints": { "title": "Pay 1 ETH to ACME", "subtitle": "Order ORD-001" },
+  "chain_id": 1,
+  "ui_hints": {
+    "title": "Pay 1 ETH to ACME",
+    "subtitle": "Order ORD-001",
+    "icon_uri": "https://acme.example/logo.png",
+    "purpose": "Invoice 2025-08-13"
+  },
   "rpc": {
     "method": "eth_sendTransaction",
     "params": [{
       "to": "0x9c2b00000000000000000000000000000000dEAD",
-      "value": "0xDE0B6B3A7640000"
+      "value": "0xDE0B6B3A7640000",
+      /* optional:
+      "maxFeePerGas": "0x59682f00",
+      "maxPriorityFeePerGas": "0x3b9aca00",
+      "gas": "0x5208"
+      "data": "0x...",
+      "nonce": "0x..." 
+      */
     }]
-  }
+  },
+  "order_id": "ORD-001",
+  "eip681": "ethereum:0x9c2b00000000000000000000000000000000dEAD@1?value=1000000000000000000"
 }
+
 ```
 
-**Example (USDC transfer 50.0):**
+##### `evm.erc20_transfer`
+
+Direct mapping to **[EIP-1193 `eth_sendTransaction`](https://eips.ethereum.org/EIPS/eip-1193)**.
+
+**Parameters**
+
+- **`rpc.method`** — **REQUIRED.** Must be `"eth_sendTransaction"`.
+- **`rpc.params`** — **REQUIRED.** An array of length **1** containing a transaction object:
+  - **`to`** — **REQUIRED.** The **token contract address** (not the recipient address).
+  - **`value`** — **REQUIRED.** Must be `"0x0"` for ERC-20 transfers.
+  - **`data`** — **REQUIRED.** ABI-encoded call to `transfer(address,uint256)`:
+    - Function selector `0xa9059cbb`
+    - 32-byte padded recipient address
+    - 32-byte padded amount (token base units)
+  - **Gas fields (optional)** — `gas`, `maxFeePerGas`, `maxPriorityFeePerGas` (all hex quantities).
+  - **`from`** — OPTIONAL; will be set by the wallet/provider if omitted.
+
+**Additional UI/intent fields (not part of the signed transaction):**
+
+- **`chain_id`** — **RECOMMENDED.** If present, the wallet **MUST** execute on this chain or prompt the user to switch.
+- **`asset`** — `{ symbol, address, decimals }` for display/validation.
+- **`amount`**, **`recipient`** — Strings for display/validation; **source of truth remains `rpc.data`**.
+- **`credential_ids`**, **`ui_hints`**, **`order_id`** — Optional UX/correlation fields.
+- **`eip681`** — Optional deep link (may not be supported by all wallets).
+
+**Wallet behavior**
+
+1. Complete OIDC4VP (VP) flow first.
+2. If `chain_id` is present and differs from the current network, **prompt to switch** and only proceed on the specified chain.
+3. Decode `rpc.data` and ensure it is an ERC-20 `transfer`; **reject** if the function selector ≠ `0xa9059cbb`.
+4. Optionally cross-check `asset.address`, `recipient`, and `amount` against decoded calldata and warn on mismatches.
+5. Present a confirmation screen to the user and send the transaction via JSON-RPC `eth_sendTransaction`.
+
+**Example — USDC transfer 50.0**
 
 ```json
 {
   "type": "evm.erc20_transfer",
   "credential_ids": ["eid_limited"],
-  "ui_hints": { "title": "Transfer 50 USDC", "subtitle": "Order ORD-004" },
+  "chain_id": 1,
+  "asset": {
+    "symbol": "USDC",
+    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "decimals": 6
+  },
+  "amount": "50000000",
+  "recipient": "0x1111111111111111111111111111111111111111",
+  "order_id": "ORD-004",
+  "ui_hints": {
+    "title": "Transfer 50 USDC",
+    "subtitle": "Order ORD-004",
+    "icon_uri": "https://example.com/usdc.png",
+    "purpose": "Invoice 2025-08-13"
+  },
   "rpc": {
     "method": "eth_sendTransaction",
-    "params": [{
-      "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      "value": "0x0",
-      "data": "0xa9059cbb0000000000000000000000001111111111111111111111111111111111111111\
-0000000000000000000000000000000000000000000000000000000002faf080"
-    }]
-  }
+    "params": [
+      {
+        "to": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "value": "0x0",
+        "data": "0xa9059cbb00000000000000000000000011111111111111111111111111111111111111110000000000000000000000000000000000000000000000000000000002faf080",
+        /* optional
+        "maxFeePerGas": "0x59682f00",
+        "maxPriorityFeePerGas": "0x3b9aca00",
+        "gas": "0x186a0"
+        */
+      }
+    ]
+  },
+  "eip681": "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48@1/transfer?address=0x1111111111111111111111111111111111111111&uint256=50000000"
 }
 
 ```
@@ -680,7 +749,7 @@ The presentation definition must URL encoded before being added in the authoriza
 
 ```json
 {
-  "id": "stablecoin-payment-auth",
+  "id": "crypto-payment-auth",
   "input_descriptors": [
     {
       "id": "eid-limited",
@@ -841,8 +910,8 @@ Payload (before encryption)
 ```json
 
 {
-  "id": "stablecoin-payment-response",
-  "definition_id": "stablecoin-payment-auth",
+  "id": "crypto-payment-response",
+  "definition_id": "crypto-payment-auth",
   "descriptor_map": [
     {
       "id": "eid-limited",
@@ -898,7 +967,7 @@ Payload of the KB JWT attached to the Identity SD-JWT VC with `transaction_data_
   It binds this KB JWT to the selective disclosure of identity data, ensuring the presented claims correspond to the original signed VC.
 - **`transaction_data_hashes`**
   An array of hashes that link the payment transaction data to this KB JWT.
-  This ensures the identity proof and the specific stablecoin transaction are cryptographically tied together, preventing substitution of transaction details.
+  This ensures the identity proof and the specific crypto transaction are cryptographically tied together, preventing substitution of transaction details.
 - **`tx_hash`**
   The hash of the unsigned blockchain transaction that will be broadcast.
   This binds the identity proof (SD-JWT VC) to a specific blockchain operation, enabling strong integrity and non-repudiation guarantees.
@@ -1043,7 +1112,7 @@ To comply with **MiCA** and **TFR**, the consent flow must provide the User with
    - A clear statement of **why the data is requested** (e.g., to comply with AML checks for transactions over €1,000).
 3. **Allow User Control**
 
-   - **Select blockchain address:** The User chooses the address from which the stablecoin transfer will originate.
+   - **Select blockchain address:** The User chooses the address from which the crypto transfer will originate.
    - **Review selective disclosure:** The User can see exactly which identity claims are being shared and which remain private.
 4. **Provide Strong Authentication and Explicit Consent**
 
@@ -1061,7 +1130,7 @@ To comply with **MiCA** and **TFR**, the consent flow must provide the User with
 
 ### Transaction data
 
-To comply with **MiCA** and the **EU Transfer of Funds Regulation (TFR)**, verifiers and Wallet providers must retain specific transaction data for auditability, AML/KYC checks, and regulatory reporting. Logging ensures that each stablecoin payment can be traced back to its source, with all required identity attributes preserved.
+To comply with **MiCA** and the **EU Transfer of Funds Regulation (TFR)**, verifiers and Wallet providers must retain specific transaction data for auditability, AML/KYC checks, and regulatory reporting. Logging ensures that each crypto payment can be traced back to its source, with all required identity attributes preserved.
 
 **Data that must be logged includes:**
 
@@ -1090,3 +1159,67 @@ To comply with **MiCA** and the **EU Transfer of Funds Regulation (TFR)**, verif
    - Nonces (`nonce`) and session identifiers (`state`) used in the OIDC4VP request/response.
    - Results of Verifier identity checks (e.g., trusted list validation).
    - Logs of consent confirmation (timestamp and authentication method such as biometric or PIN).
+
+### Minimum Wallet Crypto & Chain Capabilities
+
+#### Key Material
+
+- Generate **secp256k1** keys (ECDSA) for EVM accounts; support secure randomness (≥128-bit entropy).
+- (Optional) **ed25519** support if planning non-EVM chains later.
+- Derive Ethereum **address** from secp256k1 public key; output **EIP-55 checksum** form.
+- Encrypt and store private keys in a secure enclave/keystore or equivalent.
+- Support seed/mnemonic import (BIP-39) and HD derivation (BIP-32/44) for `m/44'/60'/…` (recommended, though not strictly required for a single account).
+
+#### Transaction Building (EVM)
+
+- Build **EIP-1559** transactions:
+  - Fields: `to`, `value`, optional `data`, `maxFeePerGas`, `maxPriorityFeePerGas`, `gas`, `nonce`, `chainId`.
+  - Support legacy/EIP-155 if needed.
+- ABI-encode ERC-20 `transfer(address,uint256)`:
+  - Selector `0xa9059cbb`
+  - 32-byte padded parameters.
+- Handle amounts with big-int math and base-unit conversion (e.g., USDC has 6 decimals).
+
+#### Signing
+
+- Sign EVM transactions with **secp256k1 ECDSA**, including proper **chainId** domain separation (EIP-155 / typed tx).
+- (Nice to have) Support **EIP-712** typed-data signing (`eth_signTypedData_v4`) for off-chain intents/approvals.
+
+#### Node/Provider & RPC
+
+- JSON-RPC provider with **EIP-1193**-compatible calls:
+  - `eth_sendTransaction` (wallet-managed signing + send) or `eth_sendRawTransaction` (if signing locally).
+  - `eth_getTransactionCount` (nonce).
+  - `eth_estimateGas`.
+  - `eth_gasPrice` / `eth_feeHistory`.
+  - `eth_chainId`.
+
+#### Chain Configuration
+
+- Maintain per-network configuration:
+  - **chainId**
+  - RPC endpoint
+  - Native currency symbol
+  - Known token addresses.
+- Ensure correct network selection before signing.
+
+#### Basic Validation & Safety
+
+- **ETH transfers**: Require `to` be an EOA or handle contract fallback; handle `value` in wei.
+- **ERC-20 transfers**: Enforce `value = 0x0` and `data` selector `0xa9059cbb` when using the `"evm.erc20_transfer"` pattern.
+
+#### Nice-to-Have
+
+- **Gas strategy**: Implement fee estimation (EIP-1559) with fallback to manual overrides.
+- **EIP-681** URI parsing (ETH & ERC-20) to create tx objects from URIs/QR codes.
+- **WalletConnect v2** transport to delegate sending to external crypto wallets when needed.
+
+#### Minimal “Done” Test
+
+With the above, the wallet should be able to:
+
+1. Generate/hold a secp256k1 key and derive an ETH address.
+2. Build an **EIP-1559** transaction:
+   - ETH send → `{ to, value }`
+   - ERC-20 send → `{ to: <token>, value: 0, data: transfer(...) }`
+3. Sign the transaction correctly for the **right chainId** and broadcast via JSON-RPC.
