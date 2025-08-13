@@ -1,4 +1,6 @@
-# Stablecoin Transfers with EUDI Compliant Crypto Wallet
+# Crypto and Stablecoin Transfers with EUDI Compliant Crypto Wallet
+
+Last Update: 13th of August 2025
 
 ## Introduction
 
@@ -9,14 +11,14 @@ This repository defines a **reference specification** for **stablecoin transfers
 For further background and industry insights, see the article:
 [The Future of Compliant Crypto in Europe – EUDI Wallets and Stablecoin Transfers](https://medium.com/@thierry.thevenet/the-future-of-compliant-crypto-in-europe-eudi-wallets-and-stablecoin-transfers-9d4c6c799c82).
 
-This repository contains the specification for enabling **stablecoin transfers** (e.g., USDC, DAI, EVM-based stable assets) using an **EUDI Wallet** or equivalent **non-custodial data wallet**.
+This repository contains the specification for enabling **crypto and stablecoin transfers** (e.g., USDC, DAI, EVM-based stable assets) using an **EUDI Wallet** or equivalent **non-custodial data wallet**.
 The specification focuses on combining **OIDC4VP**, **Verifiable Credentials (VCs)**, and **digital asset transfers** while ensuring **compliance with EU regulations** (e.g., MiCA, TFR, AMLD6) and **data privacy (GDPR)**.
 
 ---
 
 ## 📄 Specification Documents
 
-- [**Stablecoin Transfers with EUDI Compliant Wallet**](stablecoin_oidc4vp.md) – Full technical specification.
+- [**Crypto and Stablecoin Transfers with EUDI Compliant Wallet**](stablecoin_oidc4vp.md) – Full technical specification.
 - [**Use Cases and Implementation Strategies**](use_case_and_implementation_strategies.md) – Practical scenarios and verifier strategy models.
 
 ---
@@ -25,6 +27,7 @@ The specification focuses on combining **OIDC4VP**, **Verifiable Credentials (VC
 
 - **Privacy-preserving transfers** using **SD-JWT** for selective disclosure and **OIDC4VP** for verifiable presentations.
 - **Multi-chain support**: Ethereum, Etherlink, EVM-compatible chains, and other networks.
+- **Identity and Data transaction Integration Strategies**: One step or orchestration.
 - **Regulatory compliance** aligned with MiCA, AMLD6, DAC8, and eIDAS 2.0.
 - **Interoperability** with open standards such as **JWS**, **JWE**, and **DIF Presentation Exchange**.
 - **Auditability and user consent** with verifiable proofs, consent receipts, and traceable logs.
