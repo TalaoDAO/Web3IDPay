@@ -1,6 +1,6 @@
 # Crypto and Stablecoin Transfers with EUDI Compliant Crypto Wallet
 
-Last Update: 13th of August 2025
+Last Update: 18th of October 2025
 
 ## Introduction
 
