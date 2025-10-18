@@ -1,7 +1,7 @@
 # Crypto Transfers with EUDI compatible Crypto Wallet
 
-- **Version** : 2.0
-- **Date** : 13th August 2025
+- **Version** : 2.1
+- **Date** : 18th October 2025
 - **Status** : Draft
 - **Maintainer** : Altme Identity & Compliance Team
 
@@ -316,26 +316,28 @@ The **Wallet** sends the encrypted **OIDC4VP response** to the **Verifier** via 
 The **Verifier server**:
 
 - Validates all **SD-JWT VCs**, the VPs, and `transaction_data_hash`.
-- Confirms the request integrity, including the **`tx_hash`** binding.
+- Confirms the request integrity, including the **`blockchain_transaction_hash`** binding.
+
+
+#### **11.** Verifier Response
 
 Upon success, it responds with:
 
 - **HTTP 200 OK** status.
-- A **redirect_uri** for final redirection.
 
-#### **11.** Blockchain Transaction Broadcast
+#### **12.** Verifier Starts Polling
+
+- Verifier looks for the blockchain transaction confirmation
+
+#### **13.** Wallet Sends Transaction
 
 Upon receiving the 200 OK, the **Wallet** signs and broadcasts the **crypto transfer** on the blockchain network.
 
-#### **12.** Redirect to Success URI
+#### **14.** Display Success Page
 
-The **Wallet** redirects the User to the **Verifier-provided redirect_uri**, confirming completion.
+The **Verifier** displays a **success page** to the User, confirming the payment and transaction status. Verifier may offer a receipt to the user (issuance flow to consider).
 
-#### **13.** Display Success Page
-
-The **Verifier** displays a **success page** to the User, confirming the payment and transaction status.
-
-#### **14.** Store Transaction Data
+#### **15.** Store Transaction Data
 
 To comply with **MiCA** and the **EU Transfer of Funds Regulation (TFR)**, verifiers and users must retain specific transaction data for auditability, AML/KYC checks, and regulatory reporting. Logging ensures that each crypto payment can be traced back to its source, with all required identity attributes preserved. See Annex.
 
@@ -450,7 +452,6 @@ Payload
   "response_mode": "direct_post.jwt",
   "client_id": "x509_san_dns:Verifier.example.com",
   "response_uri": "https://Verifier.example.com/response",
-  "state": "s-456",
   "nonce": "n-123",
   "presentation_definition": "%7B%22id%22%3A%....2C%22fields%22%3A%5B%7B%22path%22%3A%5B%22%24.gi",
   "transaction_data": ["eyJ0eXBlIjoic3Rh....b2YgZGlnaXRhbCBnb29kcyJ9"],
@@ -494,11 +495,8 @@ Payload
   Uses `x509_san_dns:Verifier.example.com` to bind the request to a verified Verifier identity.
 - **`response_uri`**
   The endpoint on the Verifier’s server where the Wallet should POST the encrypted response.
-- **`state`**
-  A random string to maintain state between request and response.
-  Protects against CSRF attacks.
 - **`nonce`**
-  A unique value to prevent replay attacks and link the response to this request.
+  A unique value to prevent replay attacks and link the response to this request. Verifier can use the nonce to bind the wallet response.
 - **`presentation_definition`or `dcql_query`**
   A URL-encoded JSON structure defining the types of Verifiable Credentials (VCs) and claims the Verifier requires from the Wallet.
 - **`transaction_data`**
@@ -768,15 +766,6 @@ The presentation definition must URL encoded before being added in the authoriza
       "constraints": {
         "limit_disclosure": "required",
         "fields": [
-         {
-            "path": [
-              "$.vct"
-            ],
-            "filter": {
-              "type": "string",
-              "const": "eu:europa:ec.eudi.pid.1"
-            }
-          },
           { "path": ["$.given_name"]},
           { "path": ["$.family_name"]},
           { "path": ["$.birth_date"]}
@@ -800,15 +789,6 @@ The presentation definition must URL encoded before being added in the authoriza
       },
       "constraints": {
         "fields": [
-         {
-            "path": [
-              "$.vct"
-            ],
-            "filter": {
-              "type": "string",
-              "const": "urn:dev:vct:blockchain-ownership"
-            }
-          },
           { "path": ["$.blockchain_network"] },
           { "path": ["$.wallet_address"] }
         ]
@@ -864,7 +844,7 @@ Content-Type: application/x-www-form-urlencoded
 response=eyJra...9t2LQ
 ```
 
-The Wallet’s response **SHOULD be encrypted as a JWE (JSON Web Encryption)**, depending on the selected Verifier Verifier strategy.
+The Wallet’s response **MAY be encrypted as a JWE (JSON Web Encryption)**, depending on the selected Verifier Verifier strategy.
 
 - When **personal data or sensitive claims are disclosed**, encryption **MUST** be applied to prevent intermediaries (e.g., external API verifiers or payment gateways) from accessing User data.
 - If the Verifier is using a fully **in-house Verifier** with a secure channel (e.g., TLS and direct communication), encryption MAY be optional, depending on the privacy requirements.
@@ -899,9 +879,8 @@ Payload (before encryption)
 {
   "iat": 1734560000,
   "exp": 1734560500,
-  "presentation_submission": "ey....'",
+  "presentation_submission": ".....",
   "vp_token": ["ey...123DR4~", "ey..3456~"],
-  "state": "s-456"
 }
 ```
 
@@ -951,7 +930,7 @@ Payload of the KB JWT attached to the Identity SD-JWT VC with `transaction_data_
   "iat": 1709838604,
   "sd_hash": "Dy-RYwZfaaoC3inJbLslgPvMp09bH-clYP_3qbRqtW4",
   "transaction_data_hashes": [ "fOBUSQvo46yQO-wRwXBcGqvnbKIueISEL961_Sjd4do" ],
-  "tx_hash": "0xb3b20624b9eaf92d3b46db2783da9e5e86e41dd5807d1fd5a0f6dce7d2f5b51f"
+  "blockchain_transaction_hashes": [ "BUfdSQvo46yQO56wRwXBcGqvnbKIueISEL961_Sjd4do" ]
 }
 ```
 
@@ -968,8 +947,9 @@ Payload of the KB JWT attached to the Identity SD-JWT VC with `transaction_data_
 - **`transaction_data_hashes`**
   An array of hashes that link the payment transaction data to this KB JWT.
   This ensures the identity proof and the specific crypto transaction are cryptographically tied together, preventing substitution of transaction details.
-- **`tx_hash`**
-  The hash of the unsigned blockchain transaction that will be broadcast.
+- **`blockchain_transaction_hashes`**
+  An array of hashes that link the calculated blockchain transaction to this KB JWT.
+  This allows the verifier to track the blockchain transaction. Notice that the transaction hash is calculated by the wallet before the transaction is sent.
   This binds the identity proof (SD-JWT VC) to a specific blockchain operation, enabling strong integrity and non-repudiation guarantees.
 
 ## Security Considerations
