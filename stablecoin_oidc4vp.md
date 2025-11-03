@@ -641,10 +641,8 @@ Direct mapping to **[EIP-1193 `eth_sendTransaction`](https://eips.ethereum.org/E
   "recipient": "0x1111111111111111111111111111111111111111",
   "order_id": "ORD-004",
   "ui_hints": {
-    "title": "Transfer 50 USDC",
-    "subtitle": "Order ORD-004",
     "icon_uri": "https://example.com/usdc.png",
-    "purpose": "Invoice 2025-08-13"
+    "purpose": "Pay Pizza Hut"
   },
   "rpc": {
     "method": "eth_sendTransaction",
@@ -926,7 +924,7 @@ Payload of the KB JWT attached to the Identity SD-JWT VC with `transaction_data_
 ```json
 {
   "nonce": "n-123",
-  "aud": "x509_san_dns:Verifier.example.com",
+  "aud": "x509_san_dns:verifier.example.com",
   "iat": 1709838604,
   "sd_hash": "Dy-RYwZfaaoC3inJbLslgPvMp09bH-clYP_3qbRqtW4",
   "transaction_data_hashes": [ "fOBUSQvo46yQO-wRwXBcGqvnbKIueISEL961_Sjd4do" ],
