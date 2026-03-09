@@ -23,7 +23,12 @@ The approach combines:
 
 The goal is to demonstrate how **identity-assured crypto payments** can be performed while preserving the decentralized nature of blockchain transactions.
 
----
+For further background and industry insights, see the article:
+[The Future of Compliant Crypto in Europe – EUDI Wallets and Stablecoin Transfers](https://medium.com/@thierry.thevenet/the-future-of-compliant-crypto-in-europe-eudi-wallets-and-stablecoin-transfers-9d4c6c799c82).
+
+# Specification Documents
+
+- [**Crypto and Stablecoin Transfers secured with EUDI Compliant Wallet**](Secure_Crypto_P2M_EUDI_Use_Case.md) – Full technical specification.
 
 # Main Use Case
 
@@ -44,8 +49,6 @@ This separation allows the system to combine:
 - EU-compliant identity authentication
 - privacy-preserving disclosure
 
----
-
 # Key Concepts
 
 ## EUDI Wallet as Identity Layer
@@ -58,8 +61,6 @@ It enables users to:
 - present **Proof of Crypto Account Ownership credentials**
 - sign transaction consent using **advanced electronic signatures**
 - provide **selective disclosure of identity attributes**
-
----
 
 ## Proof of Crypto Account Ownership (SCA Credential)
 
@@ -74,8 +75,6 @@ Example claims include:
 - blockchain account address
 
 The credential is used during the **OpenID4VP authentication flow** to satisfy the **SCA requirements defined in ARF TS12**.
-
----
 
 ## Decentralized Payment Execution
 
@@ -93,8 +92,6 @@ The payment gateway verifies the payment by:
 2. monitoring the blockchain
 3. matching the executed transaction using the shared `transaction_id`
 
----
-
 # Standards and Protocols
 
 The architecture relies on open standards and EU frameworks including:
@@ -110,7 +107,7 @@ The architecture relies on open standards and EU frameworks including:
 
 - ARF TS12 – Strong Customer Authentication
 
-TS12 relies on **VC Type Metadata** to render transaction data in the wallet UI.  
+TS12 relies on **VC Type Metadata** to render transaction data in the wallet UI.
 Implementations should therefore support **retrieving VC metadata from the `vct` URL**, as wallet rendering may depend on the latest version of the metadata definition.
 
 ### Blockchain Standards
@@ -119,8 +116,6 @@ Implementations should therefore support **retrieving VC metadata from the `vct`
 - EVM compatible chains
 - Tezos
 - other compatible DLTs
-
----
 
 # Regulatory Alignment
 
@@ -148,49 +143,7 @@ The specification is designed to align with European regulatory frameworks inclu
 - no personal data written on-chain
 - selective disclosure of attributes
 
----
 
-# Repository Structure
-
-```
-Secure_Crypto_P2M_EUDI_Use_Case.md
-README.md
-```
-
-### Main Documents
-
-**Secure Crypto P2M Use Case**
-
-Detailed architecture and technical specification:
-
-```
-Secure_Crypto_P2M_EUDI_Use_Case.md
-```
-
-This document describes:
-
-- the payment architecture
-- the trust model
-- transaction flows
-- regulatory positioning
-- technical annex with credential examples
-
----
-
-# Implementation Example
-
-An example implementation of EUDI-compatible crypto wallet integration is available through:
-
-https://altme.io
-
-This implementation demonstrates:
-
-- proof of crypto wallet ownership
-- issuance of SCA credentials
-- integration with EUDI-compatible wallets
-- identity-assured crypto payment flows
-
----
 
 # Future Extensions
 
@@ -201,7 +154,7 @@ The architecture will continue evolving with support for:
 - Digital Euro integration
 - expanded merchant credential frameworks
 
----
+
 
 # License
 
