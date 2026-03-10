@@ -1,10 +1,11 @@
-# Use Case: Secure Identity-Assured Crypto Payments from Natural Persons to Merchants Using the EUDI Wallet
+# Secure Crypto Payments from Natural Persons to Merchants Using the EUDI Wallet
 
-**Project:** LSP Aptitude -- WP6
+**Project:** LSP Aptitude/WP6/crypto
 Verifiables, Web3 Digital Wallet, Nomadics Labs
 
-Version 0.4
-9th March 2026
+Version 0.5
+
+10th March 2026
 
 # 1. Executive Overview
 
@@ -26,7 +27,7 @@ This approach combines the strengths of decentralized blockchain infrastructure 
 The architecture integrates:
 
 - **Decentralized blockchain settlement**
-- **Qualified Electronic Attestations of Attributes ((Q)EAA)** for identity and wallet control
+- **Qualified Electronic Attestations of Attributes ((Q)EAA)** for identity and blockchain account address control
 - **Privacy-preserving selective disclosure**
 - **Strong Customer Authentication aligned with EU payment standards**
 - **Regulatory alignment with EU frameworks including eIDAS 2.0, MiCA, and GDPR**
@@ -37,33 +38,40 @@ By connecting verifiable digital identity with self-custodial crypto payments, t
 
 This payment flow aligns with the **Strong Customer Authentication (SCA) framework defined in ARF Technical Specification TS12**, which specifies how wallet-based attestations can be used to authorize transactions through verifiable presentations and transaction-bound consent.
 
-In this use case, the SCA mechanism is implemented through a **Proof of Crypto Account Ownership credential** issued as a **Qualified Electronic Attestation of Attributes (QEAA)** by a **Qualified Trust Service Provider (QTSP)**. This credential provides verifiable proof that the payer controls a specific blockchain account address without exposing private keys and user data.
+In this model, SCA is implemented through a **Proof of Crypto Account Ownership credential**, issued as a **Qualified Electronic Attestation of Attributes (QEAA)** by a **Qualified Trust Service Provider (QTSP)**.
 
-The payment authorization follows a **third-party requested SCA flow**, where the **Payment Gateway acts as a Verifier (Relying Party)** initiating the OpenID4VP Authorization Request. The request contains structured transaction data describing the crypto payment and asks the user to present:
+This credential provides verifiable proof that the payer controls a specific blockchain account address without exposing private keys or sensitive wallet information.
 
-- a **Person Identification Data (PID)** credential or another suitable **identity attestation**, and
-- an **SCA attestation proving control of the crypto account address**.
+The payment authorization follows a **third-party requested SCA flow**, where the **Payment Gateway acts as a Verifier (Relying Party)** initiating the OpenID4VP Authorization Request.
 
-The wallet processes the authorization request, displays the transaction details to the user, and — upon explicit consent — returns a **verifiable presentation** including the requested identity attributes and the SCA proof bound to the transaction.
+The request contains structured transaction data describing the crypto payment and asks the user to present:
 
-After the authentication step, the **actual payment execution is performed directly by the user using their own non-custodial crypto wallet**. The user signs and broadcasts the blockchain transaction themselves. No intermediary, payment processor, or gateway executes the on-chain transaction on behalf of the user.
+* a **Person Identification Data (PID)** credential or equivalent identity attestation
+* a **Proof of Crypto Account Ownership credential (SCA)**
 
-The **Payment Gateway does not custody funds and does not interact with the blockchain on behalf of the user**. Instead, it verifies that the payment has been successfully executed by monitoring the blockchain and matching the transaction to the original payment request.
+The EUDI Wallet processes the authorization request, displays the transaction details to the user, and—upon explicit consent—returns a **verifiable presentation** containing the requested identity attributes and the SCA proof bound to the transaction.
 
-The **link between the authenticated identity and the blockchain transaction is established through a shared `transaction_id`** which is included both in the SCA transaction data and in the merchant payment request. The payment gateway uses this identifier to associate the authenticated payment intent with the corresponding on-chain transaction.
+After authentication, the **actual payment execution is performed directly by the user using their own self-custodial crypto wallet**.
 
-Importantly, **no personal data or identity attributes are written to the blockchain**. Identity verification and authentication occur entirely off-chain through the EUDI Wallet. The blockchain is used solely as a settlement layer for the crypto transfer.
+The user signs and broadcasts the blockchain transaction themselves. No intermediary executes the on-chain transaction on behalf of the user.
 
-This architecture preserves the **decentralized nature of blockchain payments**, ensures **user-controlled transaction execution**, and remains **compliant with the SCA processing model defined in ARF TS12**.
+The **Payment Gateway does not custody funds and does not sign or submit blockchain transactions on behalf of the user**.
+
+Instead, it verifies that the payment has been executed successfully by monitoring the blockchain and matching the transaction to the original payment request.
+
+The association between authentication and settlement can be established through a shared **transaction identifier (`transaction_id`)** included in both the payment request and the blockchain transaction.
+
+Importantly, **no personal data or identity attributes are written to the blockchain**.
+
+Identity verification occurs entirely off-chain through the EUDI Wallet, while the blockchain is used solely as the **settlement layer** for the crypto transfer.
 
 # 3. Regulatory Positioning
 
 ## eIDAS 2.0
 
-- Identity authentication via EUDI Wallet
-- Qualified or advanced electronic signatures
-- Qualified Electronic Attestations of Attributes ((Q)EAA)
-- Cross-border legal recognition
+* Identity authentication via the **EUDI Wallet**
+* Use of **Qualified Electronic Attestations of Attributes (QEAA)**
+* Legally recognized authentication across EU Member States
 
 ## MiCA (Markets in Crypto-Assets Regulation)
 
@@ -84,85 +92,103 @@ This architecture preserves the **decentralized nature of blockchain payments**,
 - Selective disclosure mechanisms
 - Privacy-by-design architecture
 
+## PSD2 Alignment
+
+* Payment authorization remains under **direct control of the payer**
+* Authentication follows **Strong Customer Authentication principles**
+* No payment service provider executes the transaction
+
 # 4. Strategic Sovereignty for Europe
 
-The use of the European Digital Identity Wallet (EUDI Wallet) as the trust anchor for crypto-asset transactions also represents a strategic element of European digital sovereignty.
+Using the **European Digital Identity Wallet** as the trust anchor for crypto-asset transactions represents a strategic opportunity for **European digital sovereignty**.
 
-Today, most infrastructures enabling compliant crypto transfers — including identity layers, travel rule networks, custody providers, and payment orchestration platforms — **are developed and operated by non-European companies**. Reliance on such infrastructures may expose European economic actors to jurisdictional dependencies, regulatory asymmetries, and potential extraterritorial enforcement risks.
+Today, many infrastructures supporting regulated crypto-asset transfers—including identity layers, compliance infrastructures, and payment orchestration systems—are developed and operated by non-European providers.
 
-By leveraging the EUDI Wallet as the identity and consent layer for wallet-to-wallet crypto payments, **Europe can establish a sovereign trust framework** that:
+This dependence can expose European economic actors to:
 
-- Anchors transaction authentication in a European regulatory and technological framework (eIDAS 2.0)
-- Ensures that identity verification, consent management, and attribute attestations remain under European governance
-- Reduces dependency on non-European compliance infrastructures
-- Enables interoperable and privacy-preserving identity-based payments across the EU single market
-- Provides a foundation for future integration with European financial infrastructures, including the Digital Euro
+* jurisdictional dependencies
+* regulatory asymmetries
+* extraterritorial enforcement risks
 
-In this model, the EUDI Wallet becomes the sovereign identity layer for decentralized financial interactions, enabling compliant crypto-asset transfers without relying on centralized intermediaries or foreign infrastructure providers.
+By leveraging the **EUDI Wallet** as the identity and consent layer for wallet-to-wallet crypto payments, Europe can establish a **sovereign trust framework** that:
 
-This approach strengthens the strategic autonomy of the European digital economy while preserving the decentralized nature of blockchain-based payments.
+* Anchors authentication in a **European regulatory framework (eIDAS 2.0)**
+* Ensures identity verification and consent management remain under **European governance**
+* Reduces dependency on non-European compliance infrastructures
+* Enables interoperable identity-based payments across the EU Single Market
+* Provides a foundation for integration with **European financial infrastructures**, including the **Digital Euro**
+
+This architecture preserves the **decentralized nature of blockchain settlement** while reinforcing European control over the **identity and trust layers of digital financial interactions**.
 
 # 5. Business & Ecosystem Impact
 
 ## For Merchants
 
-- Reduced fraud and phishing risks
-- Identity-assured payer authentication
-- Lower fees vs traditional payment solutions supported by intermediaries (card networks, banks, ...)
-- Cross-border EU readiness
+* Reduced fraud and phishing risks
+* Strong payer authentication through verified digital identity
+* Lower transaction costs compared to traditional payment infrastructures
+* Seamless readiness for cross-border EU payments
 
 ## For Consumers
 
-- Full control of assets
-- Transparent merchant verification
-- Strong consent protection
-- Reduced intermediary costs
+* Full control over their digital assets
+* Transparent and verifiable merchant identity
+* Strong transaction consent protection
+* Reduced intermediary costs
+* Ability to use cryptocurrency in **legally compliant commercial transactions**
 
-## For EUDIW ecosystem
+## For the EUDIW Ecosystem
 
-- Introduce innovation with a Web3 identity bound payment initiative
-- Attract digitally native and next generation users
-- Prepares ecosystem for Digital Euro integration
+* Introduces innovation through **Web3 identity-bound payments**
+* Attracts digitally native and next-generation users
+* Prepares the ecosystem for future **Digital Euro integration**
 
-# 6. Actors
+## 6. Actors
 
-## Payer (Natural Person)
+### Payer (Natural Person)
 
-- Holds an EUDI Wallet
-- Holds a non-custodial crypto wallet
-- Holds a Proof of Crypto Account Ownership ((Q)EAA)
+* Holds an **EUDI Wallet** used for identity authentication and explicit transaction consent
+* Holds a **self-custodial crypto wallet** used to execute the blockchain transaction
+* Holds a **Proof of Identity credential (PID or equivalent)** linking their identity to the wallet device
+* Holds a **Proof of Crypto Account Ownership credential (SCA as QEAA)** linking their blockchain account address to the wallet device
 
-## Merchant (Legal Person)
+### Merchant (Legal Person)
 
-- Registered legal entity
-- Holds organizational EUDI Wallet
-- Holds receiving crypto wallet
-- Can present verifiable business credentials
+* Registered legal entity providing goods or services
+* Holds a **receiving self-custodial crypto wallet address**
+* May present **verifiable attestations proving legal identity and blockchain account ownership**
 
-## Payment Gateway (Verification and Orchestration Layer)
+### Payment Gateway (Verification and Orchestration Layer)
 
-- Coordinates OpenID4VP flows
-- Displays transaction summary
-- Anchors consent hash (optional)
-- No custody
-- Not a PSP or CASP
+* Onboards and verifies merchants (KYB process or EU Business Wallet credentials)
+* Acts as the **Verifier / Relying Party** in OpenID4VP authentication flows with the EUDI Wallet
+* Orchestrates the payment authorization session and manages transaction context
+* Prepares the structured **payment request and transaction payload** presented to the payer
+* Verifies identity and **Strong Customer Authentication (SCA)** attestations returned by the EUDI Wallet
+* Monitors the blockchain to detect and match the corresponding on-chain transaction
+* Generates and distributes payment confirmations and transaction receipts
+* **Does not hold or control user funds (non-custodial)**
+* **Does not execute blockchain transactions on behalf of the user**
+* **Not a Payment Service Provider (PSP) nor a Crypto-Asset Service Provider (CASP)**
 
-## Blockchain Network
+### Blockchain Network
 
-- Ethereum / Tezos / compatible DLT
-- Records transaction immutably
+* Public blockchain infrastructure (e.g., Ethereum, Tezos, or compatible DLT)
+* Serves as the **settlement layer** for the crypto transaction
+* Records transactions immutably and provides publicly verifiable confirmation
 
 # 7. Trust Model
 
-Trust is achieved via:
+Trust in the system is established through a combination of **identity verification, cryptographic attestations, and decentralized settlement mechanisms**:
 
-1. Merchant verifiable credential
-2. Payer identity authentication
-3. Proof of Crypto Account Ownership (Q)EAA
-4. Advanced electronic signature
-5. Blockchain timestamping
+1. Merchant identity verification through **KYB or EU Business Wallet credentials**
+2. Merchant proof of **blockchain account ownership**
+3. Payer authentication through **PID or equivalent identity credential**
+4. Proof of crypto account ownership issued as a **QEAA**
+5. Explicit user consent through **advanced electronic signature**
+6. Blockchain settlement providing **publicly verifiable timestamped confirmation**
 
-No centralized payment processor validates the transaction.
+No centralized payment processor validates or executes the transaction.
 
 # 8. Detailed Transaction Flow
 
@@ -171,14 +197,13 @@ No centralized payment processor validates the transaction.
 Merchant creates structured request including:
 
 - Legal name
-- Wallet address
+- Blockchain account address
 - Amount
 - Asset
-- Invoice reference
 
 ## Step 2 -- Merchant Identity Verification
 
-Payer verifies merchant credential via EUDI Wallet.
+Payer verifies merchant identity via EUDI Wallet.
 
 ## Step 3 -- Payer Authentication with PID and SCA as Proof of Crypto Account Ownership (EUDI Wallet)
 
@@ -187,7 +212,7 @@ The flow is initiated through an OpenID4VP Authorization Request aligned with AR
 The user presents:
 
 - a Person Identification Data (PID) credential or another identity attestation
-- a Proof of Crypto Account Ownership credential ((Q)EAA)
+- a Proof of Crypto Account Ownership credential (SCA as a (Q)EAA)
 
 Selective disclosure is applied and no private keys are exposed.
 No exposure of private keys.
@@ -208,28 +233,30 @@ Gateway polls blockchain and confirms settlement.
 
 ## Reduced Risks
 
-- Merchant wallet spoofing
-- Fake QR codes
-- Phishing
-- Anonymous high-value transactions
+* Merchant wallet spoofing
+* Fake QR codes
+* Phishing attacks
+* Merchant impersonation
+* Payment request tampering
+* Anonymous high-value transactions
 
 ## Legal Strength
 
-- Signed consent evidence
-- Identity-bound audit trail
-- Regulatory defensibility
+* Signed user consent
+* Identity-bound transaction authorization
+* Verifiable audit trail
+* Strong regulatory defensibility
 
 # 10. Digital Euro Readiness
 
-This model creates the foundation for:
+This architecture creates a foundation for future **European Central Bank Digital Currency (CBDC)** use cases, including:
 
-- Identity-bound CBDC wallets
-- Merchant acceptance of digital euro
-- Strong Customer Authentication alignment
-- Cross-border interoperable payments
+* Identity-bound CBDC wallets
+* Merchant acceptance of the **Digital Euro**
+* SCA-compliant digital currency payments
+* Cross-border interoperable payments within the EU
 
-It validates the EUDI Wallet as the trusted identity layer for
-next-generation European digital payments.
+The model demonstrates how the **EUDI Wallet can act as the trusted identity layer for future European digital payment infrastructures**.
 
 # 11. Scenario -- Merchant Requested Payment Flow
 
@@ -341,7 +368,7 @@ Tezos account
   ],
   "transaction_data_types": [
     {
-      "type": "urn:eudi:sca:crypto:payment:1",
+      "type": "urn:eudi:sca:crypto:1",
       "claims": [
         {
           "path": ["payload", "transaction_id"],
@@ -349,15 +376,6 @@ Tezos account
             {
               "locale": "en-GB",
               "label": "Transaction ID"
-            }
-          ]
-        },
-        {
-          "path": ["payload", "purpose"],
-          "display": [
-            {
-              "locale": "en-GB",
-              "label": "Payment description"
             }
           ]
         },
@@ -406,7 +424,7 @@ Tezos account
 
 ```json
 {
-  "type": "urn:eudi:sca:crypto:payment:1",
+  "type": "urn:eudi:sca:crypto:1",
   "credential_ids": [
     "crypto_sca"
   ],
@@ -425,8 +443,7 @@ Tezos account
       "decimals": 6
     },
     "amount": 10,
-    "caip2_chain_id": "eip155:1",
-    "purpose": "Buy 1 Chorizo Pizza"
+    "caip2_chain_id": "eip155:1"
   }
 }
 ```
