@@ -3,9 +3,9 @@
 **Project:** LSP Aptitude/WP6/crypto
 Verifiables, Web3 Digital Wallet, Nomadics Labs
 
-Version 0.5
+Version 0.6
 
-10th March 2026
+11th March 2026
 
 # 1. Executive Overview
 
@@ -189,6 +189,8 @@ Trust in the system is established through a combination of **identity verificat
 6. Blockchain settlement providing **publicly verifiable timestamped confirmation**
 
 No centralized payment processor validates or executes the transaction.
+
+![Architecture](architecture.png)
 
 # 8. Detailed Transaction Flow
 
@@ -447,3 +449,52 @@ Tezos account
   }
 }
 ```
+
+## Payment Gateway Implementation Options
+
+The mechanism used to link an off-chain payment request with the corresponding on-chain transaction is not mandated by this specification. Implementers may select an architecture appropriate to their operational, security, and user-experience requirements. The following approaches represent commonly used patterns for handling cryptocurrency payments within an EVM-compatible environment.
+
+### ERC-20 Token Payments
+
+For payments involving standard ERC-20 tokens, several implementation models are commonly used.
+
+**Event-based transaction identification**
+
+The simplest implementation consists of monitoring ERC-20 `Transfer` events on the blockchain and identifying transactions that match the expected payment parameters, such as the recipient address and transfer amount. When a matching event is detected, the gateway associates the corresponding blockchain transaction with the off-chain payment request.
+
+**Gateway contract using `transferFrom`**
+
+In this model, the payment gateway is implemented as a smart contract that receives payment requests and performs token transfers using the ERC-20 `transferFrom` function. The payer first authorizes the gateway contract through an allowance (`approve`), after which the gateway executes the transfer to the merchant account or settlement vault.
+
+The contract emits an event containing the payment identifier and transaction details, allowing off-chain systems to reconcile the payment with the originating payment request.
+
+This approach is widely compatible with standard ERC-20 tokens and provides deterministic linkage between the off-chain payment request and the on-chain settlement event.
+
+**Gateway contract using ERC-2612 `permit`**
+
+Where supported by the token, implementers may use the ERC-2612 `permit` extension to streamline the payment flow. In this model, the payer signs an off-chain approval message authorizing the gateway contract to transfer a specified amount of tokens. The signed authorization is submitted alongside the payment transaction, allowing the contract to both register the approval and execute the token transfer within a single on-chain transaction.
+
+This approach reduces the number of transactions required from the payer and improves the user experience while maintaining compatibility with the ERC-20 token model.
+
+### Tokens Supporting Extended Authorization Mechanisms
+
+Some tokens support richer authorization mechanisms that allow payment flows to be executed using signed instructions rather than traditional allowance-based transfers.
+
+**ERC-2612 signed approvals**
+
+Tokens implementing ERC-2612 enable approvals to be granted through signed messages rather than on-chain approval transactions. Payment gateways may leverage this capability to obtain transfer authorization from the payer and complete the token transfer atomically within a single transaction.
+
+**ERC-3009 transfer authorization**
+
+Certain tokens implement authorization-based transfers (e.g., ERC-3009), which allow token transfers to be executed directly from a signed authorization message. In this model, the payer signs a transfer authorization specifying the recipient, amount, and validity parameters. The gateway or another participant submits this authorization to the token contract, which executes the transfer and records the payment.
+
+This model can enable advanced scenarios such as meta-transactions or gas-abstracted payment flows.
+
+### Implementation Flexibility
+
+Implementers may select any of the above approaches, or an equivalent mechanism, provided that the implementation ensures reliable association between:
+
+* the off-chain payment request or transaction identifier; and
+* the resulting on-chain transaction or settlement event.
+
+Implementations SHOULD ensure that the chosen mechanism provides sufficient traceability to support reconciliation, auditability, and operational monitoring of payments.
