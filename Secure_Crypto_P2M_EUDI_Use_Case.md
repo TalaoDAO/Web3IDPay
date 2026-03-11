@@ -353,7 +353,7 @@ Ethereum account
   "blockchain_network": "Ethereum",
   "caip2_chain_id": "eip155:1",
   "account_address": "0xc5d4d295878ca7a846614104d5ea3f00fcf408f2",
-  "blockchain_logo": "https://talao.co/ethereum_logo.jpeg"
+  "blockchain_logo": "https://talao.co/image/server/ethereum_logo.jpeg"
 }
 ```
 
@@ -376,7 +376,7 @@ Tezos account
   "blockchain_network": "Tezos",
   "caip2_chain_id": "tezos:NetXdQprcVkpaWU",
   "account_address": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
-  "blockchain_logo": "https://talao.co/tezos_logo.jpeg"
+  "blockchain_logo": "https://talao.co/image/server/TezosLogo_Icon_Blue.png"
 }
 ```
 
