@@ -1,6 +1,6 @@
 # Secure Crypto Payments from Natural Persons to Merchants Using the EUDI Wallet
 
-Version 0.6.3
+Version 0.6.4
 
 12th March 2026
 
@@ -342,18 +342,21 @@ This architecture mitigates several risks commonly associated with crypto asset-
 
 ## Legal Strength
 
-The flow introduces legally relevant safeguards that are typically absent from standard crypto asset-payments:
+The flow introduces legally relevant safeguards that are typically absent from standard crypto asset payments:
 
-* **Explicit user consent**
-  The payer approves the transaction through a signed authorization step in the EUDI Wallet.
-* **Identity-bound authorization**
-  Authentication with PID and proof of crypto account ownership links the transaction approval to a verified user identity.
-* **Cryptographic transaction integrity**
-  The blockchain transaction is signed by the payer’s self-custodial crypto wallet, ensuring integrity of the payment execution.
-* **Verifiable audit trail**
-  The combination of identity authentication, signed consent, and blockchain settlement creates a **traceable and auditable payment flow**.
+* **Explicit user consent**  
+  The payer approves the transaction through a **signed authorization step in the EUDI Wallet**.
+* **Identity-bound authorization using eIDAS-qualified attestations**  
+  Authentication relies on a **PID and qualified electronic attestations of attributes issued under the eIDAS framework**, combined with proof of crypto account ownership. This links the transaction approval to a **verified and legally recognized user identity**.
+* **End-to-end cryptographic transaction integrity**  
+  The blockchain transaction is signed by the payer’s **self-custodial crypto wallet**, which is linked to the signed authorization step, ensuring the integrity of the payment execution.
+* **Verifiable audit trail**  
+  The combination of **qualified identity attestations, signed consent, and blockchain settlement** creates a **traceable and auditable payment flow**.
 
-These elements provide a stronger foundation for **regulatory compliance, dispute resolution, and fraud investigation** compared to conventional anonymous crypto transfers.
+These elements provide a stronger foundation for **regulatory compliance, dispute resolution, and fraud investigation** compared to conventional crypto transfers.
+
+The use of **eIDAS-qualified attestations and identity verification within the EUDI Wallet introduces a level of legal assurance that is typically absent from conventional crypto payment mechanisms.**
+
 
 # 11. Digital Euro Readiness
 
