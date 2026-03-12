@@ -368,9 +368,10 @@ Tezos account
   "vct": "https://talao.co/vct/crypto",
   "cnf": {
     "jwk": {
-      "kty": "OKP",
-      "crv": "Ed25519",
-      "x": "VCpo2LMLhn6iWku8MKvSLg2ZAoC-nlOyPVQaO3FxVeQ"
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "TCAER19Zvu3OHF4j4W4vfSVoHIP1ILilDls7vCeGemc",
+      "y": "ZxjiWWbZMQGHVWKVQ4hbSIirsVfuecCE6t4jT9F2HZQ"
     }
   },
   "blockchain_network": "Tezos",
