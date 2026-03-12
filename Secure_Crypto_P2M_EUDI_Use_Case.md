@@ -373,32 +373,46 @@ This architecture demonstrates how the **EUDI Wallet can function as the identit
 
 # 12. Scenario -- Merchant Requested Payment Flow
 
+The following sequence diagram illustrates the interaction between the payer, the EUDI Wallet, the payer’s crypto wallet, the payment gateway, and the blockchain during a P2M crypto payment.
+
+
 ```mermaid
 sequenceDiagram
-    participant Merchant as Merchant
+    participant Merchant as Merchant Website
     participant User as Payer
-    participant Wallet as EUDI Wallet (Payer)
-    participant Crypto as Crypto Wallet (Payer)
     participant Gateway as Payment Gateway
+    participant Wallet as EUDI Wallet (Identity & Consent)
+    participant Crypto as Crypto Wallet (Payment Execution)
     participant Blockchain as Blockchain
 
     Merchant->>Gateway: Create payment request
-    Gateway-->>User: Display QR code
-    User->>Gateway: Initiate payment
+    Gateway->>Merchant: Return gateway payment URL
+    Merchant->>User: Redirect user to gateway payment page
 
-    Gateway-->>Wallet: OpenID4VP auth request (with transaction data)
-    Wallet->>User: Show merchant & payment summary
-    User->>Wallet: Consent
-    Wallet->>Gateway: Auth response with PID, SCA and signed transaction data
+    Note over Gateway,Wallet: Phase 1 - Identity verification and consent
 
-    Gateway-->>Crypto: Transaction signature request
-    Crypto->>User: Show transaction details
+    Gateway->>User: Display QR code for EUDI Wallet
+    User-->>Wallet: Scan QR code
+    Wallet->>Gateway: Retrieve payment request
+
+    Gateway->>Wallet: OpenID4VP authorization request (merchant identity + transaction data)
+    Wallet->>User: Display merchant identity and payment summary
+    User->>Wallet: Authenticate and provide consent
+    Wallet->>Gateway: Return verifiable presentation (PID + Proof of Account Ownership + signed consent)
+
+    Note over Gateway,Crypto: Phase 2 - Blockchain transaction execution
+
+    Gateway->>User: Display QR code for Crypto Wallet
+    User-->>Crypto: Scan QR code
+    Crypto->>Gateway: Retrieve blockchain transaction parameters
+
+    Crypto->>User: Display blockchain transaction details
     User->>Crypto: Confirm transaction
     Crypto->>Blockchain: Broadcast signed transaction
 
-    Gateway->>Blockchain: Poll transaction receipt
-    Gateway-->>Merchant: Confirm payment and provide receipt
-    Gateway-->>User: Provide receipt
+    Gateway->>Blockchain: Monitor transaction settlement
+    Gateway->>Merchant: Confirm payment and provide receipt
+    Gateway->>User: Display payment confirmation
 ```
 
 # 13. Technical Annex
