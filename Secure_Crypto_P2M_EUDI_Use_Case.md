@@ -61,7 +61,36 @@ Importantly, **no personal data or identity attributes are written to the blockc
 
 Identity verification occurs entirely off-chain through the EUDI Wallet, while the blockchain is used solely as the **settlement layer** for the crypto transfer.
 
-# 3. Regulatory Positioning
+# 3. Strategic Sovereignty for Europe
+
+Using the **European Digital Identity Wallet (EUDI Wallet)** as the trust anchor for crypto-asset transactions represents a strategic opportunity for **European digital sovereignty**.
+
+Today, many infrastructures supporting regulated crypto-asset transfers—including identity layers, compliance services, and payment orchestration platforms—are developed and operated by non-European providers. This dependence can expose European economic actors to:
+
+* jurisdictional dependencies
+* regulatory asymmetries
+* extraterritorial enforcement risks
+
+The introduction of **EUDI Wallets for both natural and legal persons under eIDAS 2.0** enables a European identity framework that can support **wallet-to-wallet crypto transactions for both individuals and businesses**.
+
+In this model:
+
+* **Individuals** authenticate and authorize transactions using their personal **EUDI Wallet**
+* **Companies and merchants** can use **EUDI Wallets for legal persons** to disclose verified organizational identity attributes
+* **B2B and B2C crypto payments** can rely on verifiable European digital identity attestations rather than identity services operated by non-European platforms that currently dominate crypto compliance and payment infrastructures.
+
+By leveraging the **EUDI Wallet** as the identity and consent layer for crypto transfers, Europe can establish a **sovereign trust framework** that:
+
+* Anchors authentication in a **European regulatory framework (eIDAS 2.0)**
+* Enables **verified identities for both individuals and companies** participating in crypto transactions
+* Ensures identity verification and consent management remain under **European governance**
+* Reduces dependency on non-European identity and compliance infrastructures
+* Enables interoperable **identity-based crypto payments across the EU Single Market**
+* Provides a foundation for integration with European financial infrastructures, including the **Digital Euro**
+
+This architecture preserves the **decentralized nature of blockchain settlement** while reinforcing European control over the **identity, authentication, and trust layers of digital financial interactions**.
+
+# 4. Regulatory Positioning
 
 ## eIDAS 2.0
 
@@ -100,28 +129,6 @@ PSD2 primarily regulates **fiat payment services provided by regulated payment s
 However, this architecture aligns with key **PSD2 security principles**, including strong user authentication, explicit user consent, and **dynamic linking of authentication to transaction data through cryptographic signing**.
 
 The design is also compatible with the direction of **PSD3 and the upcoming Payment Services Regulation (PSR)**, which reinforce authentication, fraud prevention, and user protection requirements. Because transactions are executed directly by the user without an intermediary payment service provider, most regulatory obligations applicable to PSPs do not apply.
-
-# 4. Strategic Sovereignty for Europe
-
-Using the **European Digital Identity Wallet** as the trust anchor for crypto-asset transactions represents a strategic opportunity for **European digital sovereignty**.
-
-Today, many infrastructures supporting regulated crypto-asset transfers—including identity layers, compliance infrastructures, and payment orchestration systems—are developed and operated by non-European providers.
-
-This dependence can expose European economic actors to:
-
-* jurisdictional dependencies
-* regulatory asymmetries
-* extraterritorial enforcement risks
-
-By leveraging the **EUDI Wallet** as the identity and consent layer for wallet-to-wallet crypto payments, Europe can establish a **sovereign trust framework** that:
-
-* Anchors authentication in a **European regulatory framework (eIDAS 2.0)**
-* Ensures identity verification and consent management remain under **European governance**
-* Reduces dependency on non-European compliance infrastructures
-* Enables interoperable identity-based payments across the EU Single Market
-* Provides a foundation for integration with **European financial infrastructures**, including the **Digital Euro**
-
-This architecture preserves the **decentralized nature of blockchain settlement** while reinforcing European control over the **identity and trust layers of digital financial interactions**.
 
 # 5. Business & Ecosystem Impact
 
@@ -301,7 +308,6 @@ This step is executed **entirely within the user's crypto wallet**, which remain
 The **payment gateway monitors the blockchain** and confirms settlement once the transaction is included on-chain.
 
 A receipt or confirmation can then be returned to the merchant and payer.
-
 
 # 9. Risk & Liability Analysis
 
