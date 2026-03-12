@@ -42,7 +42,6 @@ A **payment gateway** orchestrates the payment interaction. It generates the str
 
 In this architecture, the blockchain acts purely as the **settlement layer**, while identity verification and consent are handled off-chain through the EUDI trust framework. This separation allows identity-verified crypto payments without introducing custodial intermediaries or compromising user control over assets.
 
-
 # 3. Roles and Actors
 
 ## Payer (Natural Person)
@@ -199,8 +198,6 @@ The design is also compatible with the direction of **PSD3 and the upcoming Paym
 * Introduces innovation through **Web3 identity-bound payments**
 * Attracts digitally native and next-generation users
 * Prepares the ecosystem for future **Digital Euro integration**
-
-
 
 # 8. Trust Model
 
@@ -373,8 +370,7 @@ This architecture demonstrates how the **EUDI Wallet can function as the identit
 
 # 12. Scenario -- Merchant Requested Payment Flow
 
-The following sequence diagram illustrates the interaction between the payer, the EUDI Wallet, the payer’s crypto wallet, the payment gateway, and the blockchain during a P2M crypto payment.
-
+The following sequence diagram illustrates the interaction between the payer, the EUDI wallet, the payer’s crypto wallet, the payment gateway, and the blockchain during a P2M crypto payment.
 
 ```mermaid
 sequenceDiagram
@@ -389,7 +385,7 @@ sequenceDiagram
     Gateway->>Merchant: Return gateway payment URL
     Merchant->>User: Redirect user to gateway payment page
 
-    Note over Gateway,Wallet: Phase 1 - Identity verification and consent
+    Note over Gateway,Wallet: Identity verification and consent with EUDI wallet
 
     Gateway->>User: Display QR code for EUDI Wallet
     User-->>Wallet: Scan QR code
@@ -400,7 +396,7 @@ sequenceDiagram
     User->>Wallet: Authenticate and provide consent
     Wallet->>Gateway: Return verifiable presentation (PID + Proof of Account Ownership + signed consent)
 
-    Note over Gateway,Crypto: Phase 2 - Blockchain transaction execution
+    Note over Gateway,Crypto: Blockchain transaction execution with crypto wallet
 
     Gateway->>User: Display QR code for Crypto Wallet
     User-->>Crypto: Scan QR code
