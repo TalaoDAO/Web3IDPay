@@ -2,162 +2,207 @@
 
 Last update: March 2026
 
-## Introduction
+This repository provides a **reference architecture and specification** describing how the **European Digital Identity Wallet (EUDI Wallet)** can enable **secure and compliant crypto-asset payments** while preserving the decentralized nature of blockchain settlement.
 
-The rapid growth of **digital assets, stablecoins, and decentralized finance** is transforming payments and digital commerce. However, the adoption of these technologies in Europe requires solutions that combine:
+The primary scenario described is a **person-to-merchant (P2M) crypto payment**, where a natural person pays a merchant using a **self-custodial crypto wallet**, while the **EUDI Wallet provides the trusted identity, authentication, and consent layer**.
+
+The architecture demonstrates how **identity-verified crypto payments** can be implemented in alignment with European regulatory frameworks including **eIDAS 2.0, MiCA, GDPR, and ARF TS12 Strong Customer Authentication**.
+
+The complete specification is available here:
+
+- **[Secure Crypto P2M Payments Using the EUDI Wallet](Secure_Crypto_P2M_EUDI_Use_Case.md)**
+
+---
+
+# Overview
+
+The growth of **digital assets, stablecoins, and decentralized finance** is transforming digital commerce. However, large-scale adoption in Europe requires solutions that combine:
 
 - regulatory compliance
-- user privacy
-- secure identity verification
-- interoperability with EU digital identity frameworks
+- strong authentication
+- privacy-preserving identity verification
+- interoperability with the **European Digital Identity framework**
 
-This repository provides a **reference architecture and specification** for enabling **secure crypto and stablecoin payments using the European Digital Identity Wallet (EUDI Wallet)**.
-
-The approach combines:
-
-- Self-custodial crypto wallets
-- Verifiable Credentials (VCs)
-- OIDC4VP / OIDC4VCI protocols
-- Selective disclosure with SD-JWT
-- Strong Customer Authentication (SCA) aligned with the **EUDI ARF TS12 specifications**
-
-The goal is to demonstrate how **identity-assured crypto payments** can be performed while preserving the decentralized nature of blockchain transactions.
-
-For further background and industry insights, see the article:
-[The Future of Compliant Crypto in Europe – EUDI Wallets and Stablecoin Transfers](https://medium.com/@thierry.thevenet/the-future-of-compliant-crypto-in-europe-eudi-wallets-and-stablecoin-transfers-9d4c6c799c82).
-
-# Specification Documents
-
-- [**Crypto and Stablecoin Transfers secured with EUDI Compliant Wallet**](Secure_Crypto_P2M_EUDI_Use_Case.md) – Full technical specification.
-
-# Main Use Case
-
-## Secure Crypto Person-to-Merchant Payments (P2M)
-
-The main use case described in this repository demonstrates how a **natural person can pay a merchant using a non-custodial crypto wallet**, while the **EUDI Wallet provides the trusted identity and authentication layer**.
+This project illustrates how **EUDI Wallets and self-custodial crypto wallets can work together** to enable **secure, identity-verified blockchain payments**.
 
 In this architecture:
 
-- the **EUDI Wallet performs identity authentication and Strong Customer Authentication (SCA)**
-- the **crypto wallet performs the blockchain transaction**
-- the **payment gateway verifies the payment and the identity proof**
-- **no intermediary executes the on-chain transaction**
+- the **EUDI Wallet** performs identity authentication and transaction consent
+- the **crypto wallet** performs the blockchain transaction
+- a **payment gateway** orchestrates the payment interaction
+- the **blockchain acts purely as the settlement layer**
 
-This separation allows the system to combine:
+No intermediary holds funds or executes blockchain transactions on behalf of the user.
 
-- self-custodial blockchain payments
-- EU-compliant identity authentication
-- privacy-preserving disclosure
+---
 
-# Key Concepts
+# Architecture Principles
 
-## EUDI Wallet as Identity Layer
+The architecture separates **identity verification, payment authorization, and transaction execution** into independent layers.
 
-The **EUDI Wallet** acts as the **trusted identity and consent layer** for crypto payments.
+## Identity and Authentication
 
-It enables users to:
+The **EUDI Wallet** acts as the **identity and consent layer**.
 
-- authenticate using **PID or other identity credentials**
+It allows the payer to:
+
+- authenticate using **PID or equivalent identity credentials**
 - present **Proof of Crypto Account Ownership credentials**
-- sign transaction consent using **advanced electronic signatures**
-- provide **selective disclosure of identity attributes**
+- provide **explicit transaction consent**
+- sign authorization using **advanced electronic signatures**
 
-## Proof of Crypto Account Ownership (SCA Credential)
+Authentication follows the **Strong Customer Authentication (SCA)** framework defined in **EUDI ARF TS12**.
 
-Strong Customer Authentication is implemented through a **Proof of Crypto Account Ownership credential**, issued as a **Qualified Electronic Attestation of Attributes (QEAA)** by a **QTSP**.
+## Payment Execution
 
-This credential proves that the user controls a specific blockchain account without exposing private keys.
+The blockchain transaction is executed **directly by the payer** using their **self-custodial crypto wallet**.
 
-Example claims include:
+This ensures:
 
-- blockchain network
-- chain identifier
-- blockchain account address
+- full control of funds by the user
+- no custody by intermediaries
+- decentralized blockchain settlement
 
-The credential is used during the **OpenID4VP authentication flow** to satisfy the **SCA requirements defined in ARF TS12**.
+The **payment gateway** monitors the blockchain and confirms settlement once the transaction is included on-chain.
 
-## Decentralized Payment Execution
+---
 
-The blockchain transaction is **executed directly by the user** using their **non-custodial crypto wallet**.
+# Roles and Actors
 
-Key properties:
+## Payer (Natural Person)
 
-- no custody by the payment gateway
-- no intermediary executes the blockchain transaction
-- the blockchain is used purely as a **settlement layer**
+The payer:
 
-The payment gateway verifies the payment by:
+- holds an **EUDI Wallet**
+- holds a **self-custodial crypto wallet**
+- possesses identity credentials such as **PID**
+- holds a **Proof of Crypto Account Ownership credential**
 
-1. receiving the authenticated payment request
-2. monitoring the blockchain
-3. matching the executed transaction using the shared `transaction_id`
+The payer authenticates with the EUDI Wallet and executes the payment using their crypto wallet.
 
-# Standards and Protocols
+## Merchant (Legal Person)
 
-The architecture relies on open standards and EU frameworks including:
+The merchant:
 
-### Identity and Wallet Standards
+- provides goods or services
+- holds a **receiving crypto wallet address**
+- may disclose **verifiable credentials proving legal identity**
 
-- EUDI Wallet ARF
-- OpenID4VP
-- OpenID4VCI
-- SD-JWT VC
+Merchant identity information can be displayed to the payer during the authorization process.
 
-### Payment Authentication
+## Payment Gateway
 
-- ARF TS12 – Strong Customer Authentication
+The payment gateway acts as the **orchestration and verification layer**.
 
-TS12 relies on **VC Type Metadata** to render transaction data in the wallet UI.
-Implementations should therefore support **retrieving VC metadata from the `vct` URL**, as wallet rendering may depend on the latest version of the metadata definition.
+Its responsibilities include:
 
-### Blockchain Standards
+- generating structured payment requests
+- acting as a **Relying Party (RP)** in OpenID4VP authentication
+- verifying identity attestations returned by the EUDI Wallet
+- monitoring the blockchain to confirm payment settlement
 
-- CAIP-2 chain identifiers
-- EVM compatible chains
+The gateway **does not hold funds** and **does not execute blockchain transactions**.
+
+## Blockchain Network
+
+The blockchain serves purely as the **decentralized settlement layer** for the payment.
+
+Supported networks may include:
+
+- Ethereum and other EVM chains
 - Tezos
-- other compatible DLTs
+- other compatible distributed ledger technologies
+
+---
+
+# Strong Customer Authentication (TS12)
+
+Strong Customer Authentication is implemented through a **Proof of Crypto Account Ownership credential**, issued as a **Qualified Electronic Attestation of Attributes (QEAA)** by a **Qualified Trust Service Provider (QTSP)**.
+
+This credential proves that the user controls a specific blockchain address without exposing private keys.
+
+During the **OpenID4VP authentication flow**, the payer presents:
+
+- an identity credential (PID or equivalent)
+- the **crypto account ownership credential**
+
+The EUDI Wallet binds these credentials to the **transaction context** and returns a **verifiable presentation** confirming the authorization.
+
+---
+
+# Trust Model
+
+Trust in the system is established through three complementary components:
+
+### Wallet → Payment Gateway
+
+The EUDI Wallet verifies that the gateway is an **authorized relying party** within the EUDI trust framework.
+
+### Merchant → Wallet Attestations
+
+The merchant relies on:
+
+- verifiable identity credentials
+- proof of crypto account ownership
+- user-generated signatures
+
+### Blockchain Settlement
+
+The blockchain provides a **publicly verifiable settlement layer** confirming that the payment has been executed.
+
+---
 
 # Regulatory Alignment
 
-The specification is designed to align with European regulatory frameworks including:
+The architecture aligns with major European regulatory frameworks.
 
 ### eIDAS 2.0
 
-- EUDI Wallet identity authentication
-- Qualified Electronic Attestations of Attributes (QEAA)
+- EUDI Wallet authentication
+- Qualified Electronic Attestations of Attributes
 - advanced electronic signatures
 
 ### MiCA
 
+- compliant merchant acceptance of crypto-assets
 - identity-assured crypto payments
-- compliant merchant acceptance of crypto assets
 
 ### TFR (Travel Rule)
 
 - selective disclosure of originator information
-- risk-based compliance
+- compliance support when required
 
 ### GDPR
 
-- privacy by design
+- privacy-by-design architecture
 - no personal data written on-chain
-- selective disclosure of attributes
+- selective disclosure mechanisms
 
+### PSD2 / PSD3 Principles
 
+Although PSD2 does not regulate peer-to-peer crypto transfers, the architecture follows key principles:
+
+- Strong Customer Authentication
+- explicit user consent
+- dynamic linking of transaction parameters
+
+---
 
 # Future Extensions
 
-The architecture will continue evolving with support for:
+The architecture may be extended to additional scenarios, including:
 
-- EVM wallets
-- additional blockchain networks
-- Digital Euro integration
-- expanded merchant credential frameworks
+- **person-to-person crypto payments**
+- **merchant-to-merchant payments**
+- **legal person wallets**
+- **Digital Euro payment integration**
 
+Additional blockchain networks and wallet implementations may also be supported.
 
+---
 
-# License
+# Specification Document
 
-This repository provides a **reference specification and implementation guidance** for research and interoperability purposes.
+The full architecture, flow diagrams, and technical examples are described in:
 
-Please refer to individual document headers for detailed licensing information.
+- **Secure Crypto Payments from Natural Persons to Merchants Using the EUDI Wallet**
