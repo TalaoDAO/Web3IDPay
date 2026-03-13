@@ -213,4 +213,8 @@ Additional blockchain networks and wallet implementations may also be supported.
 
 The full architecture, flow diagrams, and technical examples are described in:
 
-- **Secure Crypto Payments from Natural Persons to Merchants Using the EUDI Wallet**
+
+**[Secure Crypto P2M Payments Using the EUDI Wallet](Secure_Crypto_P2M_EUDI_Use_Case.md)**
+
+
+
