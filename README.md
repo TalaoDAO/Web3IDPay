@@ -65,6 +65,14 @@ This ensures:
 
 The **payment gateway** monitors the blockchain and confirms settlement once the transaction is included on-chain.
 
+## Architecture & Trust Model
+
+The following diagram illustrates the high-level architecture and trust relationships between the payer, the merchant, the payment gateway, the EUDI identity system, and the blockchain settlement layer.
+
+Identity authentication and transaction consent are handled off-chain through the **EUDI Wallet**, while the **blockchain acts purely as the decentralized settlement layer**.  
+The **payment gateway orchestrates the interaction** between the parties without holding funds or executing blockchain transactions.
+
+![EUDI Crypto Payment Architecture](architecture.png)
 ---
 
 # Roles and Actors
