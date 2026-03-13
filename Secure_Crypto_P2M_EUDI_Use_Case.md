@@ -1,8 +1,8 @@
 # Secure Crypto Payments from Natural Persons to Merchants Using the EUDI Wallet
 
-Version 0.6.4
+Version 0.6.5
 
-12th March 2026
+13 March 2026
 
 # 1. Executive Overview
 
@@ -12,10 +12,10 @@ The model allows a natural person to pay a merchant using a **self-custodial cry
 
 The architecture establishes a payment flow where:
 
-- A natural person initiates a payment using their **self-custodial crypto wallet**
+- A natural person initiates a payment using the **EUDI Wallet**
 - Identity authentication is performed using the **EUDI Wallet**
 - User consent is captured and **legally binding**
-- The **user executes the blockchain transaction directly**, maintaining full control of their assets
+- The **user executes the blockchain transaction directly**, maintaining full control of their assets through their **self-custodial crypto wallet**
 - **No custodial intermediary or payment processor** executes the transaction on-chain
 
 This approach combines the strengths of decentralized blockchain infrastructure with the trust framework of the European Digital Identity ecosystem.
@@ -344,19 +344,18 @@ This architecture mitigates several risks commonly associated with crypto asset-
 
 The flow introduces legally relevant safeguards that are typically absent from standard crypto asset payments:
 
-* **Explicit user consent**  
+* **Explicit user consent**
   The payer approves the transaction through a **signed authorization step in the EUDI Wallet**.
-* **Identity-bound authorization using eIDAS-qualified attestations**  
+* **Identity-bound authorization using eIDAS-qualified attestations**
   Authentication relies on a **PID and qualified electronic attestations of attributes issued under the eIDAS framework**, combined with proof of crypto account ownership. This links the transaction approval to a **verified and legally recognized user identity**.
-* **End-to-end cryptographic transaction integrity**  
+* **End-to-end cryptographic transaction integrity**
   The blockchain transaction is signed by the payer’s **self-custodial crypto wallet**, which is linked to the signed authorization step, ensuring the integrity of the payment execution.
-* **Verifiable audit trail**  
+* **Verifiable audit trail**
   The combination of **qualified identity attestations, signed consent, and blockchain settlement** creates a **traceable and auditable payment flow**.
 
 These elements provide a stronger foundation for **regulatory compliance, dispute resolution, and fraud investigation** compared to conventional crypto transfers.
 
 The use of **eIDAS-qualified attestations and identity verification within the EUDI Wallet introduces a level of legal assurance that is typically absent from conventional crypto payment mechanisms.**
-
 
 # 11. Digital Euro Readiness
 
