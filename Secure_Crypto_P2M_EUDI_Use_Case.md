@@ -1,8 +1,8 @@
 # Secure Crypto Payments from Natural Persons to Merchants Using the EUDI Wallet
 
-Version 0.8.0
+Version 0.8.1
 
-22nd of March 2026
+23rd of March 2026
 
 # 1. Executive Overview
 
@@ -34,71 +34,76 @@ The architecture integrates:
 
 By combining verifiable digital identity with self-custodial crypto asset-payments, this model illustrates how the **EUDI Wallet can act as the trusted identity and consent layer for next-generation digital payments in Europe**.
 
-
 # 2. Architecture Overview
 
 The proposed architecture separates **identity, payment authorization, and transaction execution** into distinct components, while preserving the decentralized nature of blockchain settlement.
 
 Two architectural options are considered to introduce an identity layer into crypto-asset transfers between non-custodial wallets on public blockchains.
 
-
 ## Option 1 — Dual Wallet Model
 
 The user controls two distinct wallets:
-- an **EUDI Wallet** for identity, authentication, and consent  
-- a **self-custodial crypto wallet** for transaction execution  
+
+- an **EUDI Wallet** for identity, authentication, and consent
+- a **self-custodial crypto wallet** for transaction execution
 
 The **EUDI Wallet** provides the identity layer. It enables the payer to:
-- present verifiable identity attestations  
-- prove control of a blockchain account through a **Proof of Crypto Account Ownership (SCA)**  
-- provide explicit, transaction-bound consent aligned with **ARF TS12**  
+
+- present verifiable identity attestations
+- prove control of a blockchain account through a **Proof of Crypto Account Ownership (SCA)**
+- provide explicit, transaction-bound consent aligned with **ARF TS12**
 
 This model requires an initial setup step:
-- issuance of a **Proof of Crypto Account Ownership attestation**, bound to the user’s device  
+
+- issuance of a **Proof of Crypto Account Ownership attestation**, bound to the user’s device
 
 The **self-custodial crypto wallet** remains responsible for execution. It holds the user’s private keys and signs the blockchain transaction, ensuring full user control over funds.
 
 The **merchant’s payment gateway** (acting as Relying Party) orchestrates the interaction by:
-- generating the structured payment request  
-- providing merchant identity information  
-- initiating the OpenID4VP authentication request  
-- preparing transaction parameters (recipient, amount, asset, context)  
+
+- generating the structured payment request
+- providing merchant identity information
+- initiating the OpenID4VP authentication request
+- preparing transaction parameters (recipient, amount, asset, context)
 
 The user’s crypto wallet independently signs and submits the transaction to the blockchain. The gateway only monitors settlement and confirms payment.
 
 In this model:
-- the blockchain acts as a **settlement layer only**  
-- identity verification and consent remain **off-chain**  
+
+- the blockchain acts as a **settlement layer only**
+- identity verification and consent remain **off-chain**
 
 This separation enables identity-verified crypto payments without introducing custodial intermediaries.
 
 ![Dual Wallet Model](dual_wallet.png)
-
 
 ## Option 2 — Smart Contract Wallet Model
 
 This model leverages **account abstraction**, where the user’s wallet is implemented as an **on-chain smart contract account**.
 
 Initial setup includes:
-- deployment of a **smart contract wallet**  
-- issuance of a **Proof of Crypto Account Ownership attestation** bound to the user  
+
+- deployment of a **smart contract wallet**
+- issuance of a **Proof of Crypto Account Ownership attestation** bound to the user
 
 Once initialized, the **EUDI Wallet becomes the primary interface** for both authorization and execution.
 
 The payment flow remains based on **OpenID4VP** and **ARF TS12**, but authorization artifacts are used directly on-chain. These are provided to the smart contract wallet, which performs:
 
-1. **Signature verification** (e.g., P-256 via EIP-7212)  
-2. **Validation of transaction parameters** (amount, recipient, asset)  
-3. **Execution of the blockchain transaction**  
+1. **Signature verification** (e.g., P-256 via EIP-7212)
+2. **Validation of transaction parameters** (amount, recipient, asset)
+3. **Execution of the blockchain transaction**
 
 In this model:
-- identity-bound authorization is **verified on-chain**  
-- execution is **deterministically enforced by the smart contract**  
+
+- identity-bound authorization is **verified on-chain**
+- execution is **deterministically enforced by the smart contract**
 
 The merchant’s payment gateway continues to:
-- act as **Relying Party (Verifier)**  
-- prepare transaction data  
-- facilitate interaction  
+
+- act as **Relying Party (Verifier)**
+- prepare transaction data
+- facilitate interaction
 
 It does not execute or control the transaction.
 
@@ -170,28 +175,47 @@ Depending on the architecture:
 - Operates the payment gateway
 - May present **verifiable attestations** of legal identity and account ownership
 
-
 ## Payment Gateway (Verifier / Orchestration Layer)
 
-The Payment Gateway is a **technical component operated by, or on behalf of, the merchant**.
+The Payment Gateway is a **technical component operated by the merchant as part of its own infrastructure**.
 
 In this architecture, the gateway acts as the **Relying Party (Verifier)** in OpenID4VP flows and represents the merchant within the EUDI trust framework.
 
-It is not an independent financial intermediary, but part of the merchant’s technical infrastructure used to:
+The gateway’s functions are limited to technical processing and communication, including:
 
-- initiate authentication and SCA requests to the EUDI Wallet
-- prepare structured transaction data associated with the merchant’s payment request
-- verify identity and SCA attestations returned by the wallet
-- facilitate interaction between the payer, the merchant, and the user’s wallets
-- monitor blockchain settlement and confirm payment to the merchant
+- initiating authentication and SCA requests to the EUDI Wallet on behalf of the merchant
+- transmitting **merchant-defined** structured transaction data (recipient, amount, asset, context)
+- verifying the integrity and validity of identity and SCA attestations returned by the wallet
+- facilitating technical communication between the payer, the merchant, and the user’s wallets
+- monitoring blockchain settlement and confirming payment to the merchant
+
+The gateway does not at any time:
+
+- hold or control crypto-assets
+- initiate transactions on behalf of the user
+- modify transaction parameters after user consent
+- have signing authority over the transaction
+- determine whether a transaction is executed
+
+The execution of the transaction remains **exclusively under the control of the user’s wallet**.
+
+AML/CFT obligations related to the payment flow are performed at the level of the **Payment Gateway as part of the merchant’s infrastructure**, under the responsibility of the merchant as the obligated entity.
+
+These obligations may include:
+
+- transaction monitoring
+- detection of suspicious activity
+- reporting to competent authorities
 
 Depending on the architecture:
 
 - **Dual Wallet Model**
-  The transaction is executed by the user’s self-custodial crypto wallet
+  The transaction is executed exclusively by the user’s self-custodial crypto wallet.
 - **Smart Contract Wallet Model**
-  In the Smart Contract Wallet Model, the Payment Gateway may optionally act as a relay or gas sponsor. In this role, it only transmits a user-authorized transaction package and cannot independently initiate, modify, or control execution of the payment. The gateway does not hold funds, does not have signing authority over the transaction, and does not determine whether a transaction is executed.
-  
+  The Payment Gateway may optionally act as a relay or gas sponsor. In this role, it only transmits a **user-authorized transaction package** and cannot independently initiate, modify, or control execution of the payment.
+
+  The gateway does not hold funds, does not have signing authority over the transaction, and does not determine whether a transaction is executed.
+
 ## Blockchain Network
 
 Public blockchain infrastructure providing:
@@ -226,13 +250,30 @@ A shared **transaction identifier (`transaction_id`)** can link authentication a
 
 No personal data is written on-chain; identity verification remains off-chain within the EUDI Wallet.
 
-
 # 5. SCA Issuance
 
 The detailed technical implementation of the issuance of the **Proof of Crypto Account Ownership (SCA)** is out of scope. This specification focuses on its use within a payment flow aligned with **ARF TS12**.
 
 For regulatory alignment, the credential **MUST be issued as a Qualified Electronic Attestation of Attributes (QEAA)** by a **Qualified Trust Service Provider (QTSP)** in accordance with **eIDAS 2.0**.
 
+## AML and Identity Assurance at Issuance
+
+The issuance of the SCA credential represents a critical step in establishing a **trusted binding between a verified identity and a blockchain account**.
+
+As part of this process, the QTSP may perform **Customer Due Diligence (CDD)** measures in line with applicable **AML/CFT requirements**, including:
+
+- verification of the user’s identity based on **high-assurance identity credentials** (e.g. PID)
+- validation of the authenticity and integrity of identity attributes
+- where applicable, screening against relevant risk indicators (e.g. sanctions lists)
+
+This issuance step provides a **reusable, high-assurance identity-to-account binding**, which can be leveraged across multiple transactions.
+
+However, this does not replace ongoing AML/CFT obligations.
+Entities involved in the payment flow (e.g. merchants) remain responsible for:
+
+- **transaction monitoring**
+- **detection of suspicious activity**
+- **reporting obligations under applicable AML regulations**
 
 ## Issuance Models
 
@@ -240,38 +281,36 @@ The issuance process depends on the wallet architecture:
 
 ### Option 1 — Dual Wallet Model
 
-- The blockchain account is generated and controlled by the user’s **self-custodial crypto wallet**  
-- The QTSP issues the QEAA based on **proof of control of this account**  
+- The blockchain account is generated and controlled by the user’s **self-custodial crypto wallet**
+- The QTSP issues the QEAA based on **proof of control of this account**
 
 ### Option 2 — Smart Contract Wallet Model
 
-- The blockchain account is an **on-chain smart contract account**  
-- The QTSP (or a delegated issuer) **deploys the smart contract wallet** and issues the QEAA  
+- The blockchain account is an **on-chain smart contract account**
+- The QTSP (or a delegated issuer) **deploys the smart contract wallet** and issues the QEAA
 
 In this model, the **identity, wallet key, and blockchain account are bound at issuance**, forming a single cryptographic trust anchor.
-
 
 ## Consistency Requirements
 
 In all cases:
 
-- The blockchain account referenced in the QEAA is the **security anchor**  
-- The QEAA provides **verifiable proof of control** of that account  
-- The payment **MUST be executed using the same account**  
+- The blockchain account referenced in the QEAA is the **security anchor**
+- The QEAA provides **verifiable proof of control** of that account
+- The payment **MUST be executed using the same account**
 
 Relying parties **MUST verify** that the blockchain address in the QEAA matches the address used in the transaction.
 
 This ensures that the **authenticated user and the transaction executor are cryptographically linked**.
 
-
 ## Implementation Principles
 
 Implementations MUST ensure:
 
-- **Cryptographic proof of account control**  
-- **Secure binding** between the blockchain account and the EUDI Wallet holder  
-- **Replay and relay protection**  
-- A **verifiable and consistent link** between identity, wallet key, and blockchain account  
+- **Cryptographic proof of account control**
+- **Secure binding** between the blockchain account and the EUDI Wallet holder
+- **Replay and relay protection**
+- A **verifiable and consistent link** between identity, wallet key, and blockchain account
 
 The specific binding mechanisms are implementation-dependent.
 
@@ -279,54 +318,68 @@ The specific binding mechanisms are implementation-dependent.
 
 ## eIDAS 2.0
 
-- Identity authentication is performed via the **EUDI Wallet**  
-- Use of **Qualified Electronic Attestations of Attributes (QEAA)** issued by **Qualified Trust Service Providers (QTSPs)**  
-- Authentication and signatures are **legally recognized across EU Member States**  
+- Identity authentication is performed via the **EUDI Wallet**
+- Use of **Qualified Electronic Attestations of Attributes (QEAA)** issued by **Qualified Trust Service Providers (QTSPs)**
+- Authentication and signatures are **legally recognized across EU Member States**
 
 This architecture leverages the **EUDI trust framework** to provide high-assurance, cross-border identity and authentication.
-
 
 ## MiCA and TFR
 
 MiCA and TFR regulate **crypto-asset services provided by intermediaries (CASPs)** and do not directly apply to **peer-to-peer transfers between self-custodial wallets**.
 
 This architecture operates outside the scope of CASP services, as it:
-- does not provide custody, exchange, or transfer services  
-- relies exclusively on **user-controlled, self-custodial wallets**  
+
+- does not provide custody, exchange, or transfer services
+- relies exclusively on **user-controlled, self-custodial wallets**
 
 However, it aligns with the regulatory objectives of MiCA and TFR by:
-- enabling **identification of the payer and (optionally) the merchant**  
-- strengthening the **binding between identity and blockchain accounts**  
-- improving **traceability and auditability of transactions**  
+
+- enabling **identification of the payer and (optionally) the merchant**
+- strengthening the **binding between identity and blockchain accounts**
+- improving **traceability and auditability of transactions**
 
 This supports a level of transparency comparable to regulated environments, without introducing intermediaries.
+
+## AML / CFT Considerations
+
+This architecture introduces a **layered approach to AML/CFT compliance**, combining identity assurance at issuance with transaction-level controls.
+
+- At issuance, the **Proof of Crypto Account Ownership (SCA)** may be issued by a **QTSP** following **Customer Due Diligence (CDD)** measures, establishing a **trusted binding between a verified identity and a blockchain account**.
+- During the payment flow, AML/CFT obligations remain applicable to relevant actors (e.g. merchants), including:
+
+  - **transaction monitoring**
+  - **detection of suspicious activity**
+  - **reporting obligations under applicable regulations**
+
+The solution therefore supports AML objectives by enabling **reliable identification of the payer and strong linkage between identity and transaction execution**, while preserving a self-custodial model.
 
 ## GDPR
 
 The architecture follows **privacy-by-design principles**, including:
 
-- **Data minimization** (only required attributes are disclosed)  
-- **Selective disclosure** through verifiable credentials  
-- **No personal data written on-chain**  
-- Off-chain identity processing within the EUDI Wallet  
+- **Data minimization** (only required attributes are disclosed)
+- **Selective disclosure** through verifiable credentials
+- **No personal data written on-chain**
+- Off-chain identity processing within the EUDI Wallet
 
 This ensures compliance with GDPR while preserving user privacy.
-
 
 ## PSD2 / PSD3 Alignment
 
 PSD2 regulates **fiat-based payment services involving payment accounts** and does not directly apply to **crypto-asset transfers between self-custodial wallets**.
 
 This architecture does not fall within the scope of payment services under PSD2, as it:
-- does not involve payment accounts  
-- does not include a payment service provider executing or initiating transactions  
-- maintains **full user control over transaction execution**  
+
+- does not involve payment accounts
+- does not include a payment service provider executing or initiating transactions
+- maintains **full user control over transaction execution**
 
 However, it aligns with key PSD2 security principles:
 
-- **Strong Customer Authentication (SCA)**-like mechanisms via the EUDI Wallet  
-- **Explicit user consent** prior to transaction execution  
-- **Dynamic linking** of authentication to transaction data through cryptographic binding  
+- **Strong Customer Authentication (SCA)**-like mechanisms via the EUDI Wallet
+- **Explicit user consent** prior to transaction execution
+- **Dynamic linking** of authentication to transaction data through cryptographic binding
 
 As such, the model is **PSD2-aligned from a security perspective**, while remaining outside its regulatory scope.
 
@@ -334,28 +387,26 @@ As such, the model is **PSD2-aligned from a security perspective**, while remain
 
 ## For Merchants
 
-- **Reduced fraud and phishing risks** through identity-bound payments and structured transaction requests  
-- **Stronger payer authentication** based on verified digital identity (EUDI Wallet)  
-- **Lower transaction costs** compared to traditional payment infrastructures and intermediaries  
-- **Improved trust and conversion** through verifiable merchant identity and transparent payment flows  
-- **Seamless cross-border readiness** within the EU through alignment with eIDAS and EUDI frameworks  
-
+- **Reduced fraud and phishing risks** through identity-bound payments and structured transaction requests
+- **Stronger payer authentication** based on verified digital identity (EUDI Wallet)
+- **Lower transaction costs** compared to traditional payment infrastructures and intermediaries
+- **Improved trust and conversion** through verifiable merchant identity and transparent payment flows
+- **Seamless cross-border readiness** within the EU through alignment with eIDAS and EUDI frameworks
 
 ## For Consumers
 
-- **Full control over digital assets** via self-custodial wallets  
-- **Transparent and verifiable merchant identity**, reducing the risk of fraud  
-- **Strong consent and transaction protection**, with clear, user-verified payment details  
-- **Reduced reliance on intermediaries**, enabling more efficient transactions  
-- Ability to use crypto-assets in **identity-enabled and compliant commercial transactions**  
-
+- **Full control over digital assets** via self-custodial wallets
+- **Transparent and verifiable merchant identity**, reducing the risk of fraud
+- **Strong consent and transaction protection**, with clear, user-verified payment details
+- **Reduced reliance on intermediaries**, enabling more efficient transactions
+- Ability to use crypto-assets in **identity-enabled and compliant commercial transactions**
 
 ## For the EUDI Wallet Ecosystem
 
-- Enables **identity-bound Web3 payments**, bridging digital identity and decentralized finance  
-- Attracts **digitally native users and innovative services**  
-- Supports future integration with **Digital Euro and regulated payment infrastructures**  
-- Contributes to a **trusted European digital payment ecosystem** combining identity, compliance, and decentralization  
+- Enables **identity-bound Web3 payments**, bridging digital identity and decentralized finance
+- Attracts **digitally native users and innovative services**
+- Supports future integration with **Digital Euro and regulated payment infrastructures**
+- Contributes to a **trusted European digital payment ecosystem** combining identity, compliance, and decentralization
 
 # 8. Trust Model
 
@@ -438,7 +489,6 @@ The **EUDI Wallet remains the final trust anchor**, ensuring user-controlled app
 
 In the Smart Contract Wallet Model, the gateway does not control execution. Even if it relays the transaction, execution is strictly determined by user-signed authorization and enforced by the smart contract logic.
 
-
 ## Trust Models by Architecture
 
 ### Dual Wallet Model (Layered Trust)
@@ -508,6 +558,7 @@ In the Smart Contract Wallet Model, transaction submission is separated from aut
 - The smart contract enforces validity and executes deterministically
 
 As a result:
+
 - submission does not imply control
 - the gateway does not act as a payment initiator
 
