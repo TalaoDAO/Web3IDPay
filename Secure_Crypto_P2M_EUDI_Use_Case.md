@@ -1,14 +1,19 @@
-# Secure Crypto Payments from Natural Persons to Merchants Using the EUDI Wallet
+# Secure Identity-Bound Crypto Payments from Natural Persons to Merchants Using the EUDI Wallet
 
-Version 0.8.2
+Version 0.8.3
 
 23rd of March 2026
 
 # 1. Executive Overview
 
-This use case demonstrates how the **European Digital Identity Wallet (EUDI Wallet)** can enable secure and compliant **person-to-merchant (P2M) crypto-asset payments** in a context limited to **self-custodial wallets and blockchain networks** , while preserving the decentralized nature of blockchain settlement.
+This use case demonstrates how the **European Digital Identity Wallet (EUDI Wallet)** can enable secure and compliant **person-to-merchant (P2M) crypto-asset payments**, supporting both **self-custodial wallets on public blockchains** and **regulated or permissioned DLT infrastructures**, while preserving user control and verifiable settlement.
 
-The model allows a natural person to pay a merchant using a **self-custodial crypto wallet**, while relying on the **EUDI Wallet as the trusted identity and authentication layer**. Through verifiable attestations, the payer proves both their identity and their control of the blockchain address used for the payment.
+The model enables **identity-bound crypto payments**, where a natural person pays a merchant using a blockchain account that is **cryptographically linked to a verified identity**. The **EUDI Wallet** acts as the trusted identity, authentication, and consent layer.
+
+Through verifiable attestations, the payer proves both:
+
+- their identity
+- their control of the blockchain address used for the payment
 
 The architecture establishes a payment flow where:
 
@@ -18,21 +23,23 @@ The architecture establishes a payment flow where:
 
 Depending on the architecture:
 
-- **Dual Wallet Model**: the user executes the blockchain transaction directly through their **self-custodial crypto wallet**, maintaining full control of their assets
-- **Smart Contract Wallet Model**: the transaction is executed through a **smart contract wallet controlled by the EUDI Wallet**, where authorization and execution are unified
-- In all cases, **no custodial intermediary or payment processor executes the transaction on-chain**
+- **Dual Wallet Model**: the user executes the blockchain transaction directly through a **self-custodial crypto wallet**, maintaining full control of their assets
+- **Smart Contract Wallet Model**: the transaction is executed through a **smart contract wallet**, where authorization and execution are unified and can support **programmable controls and regulated environments**
 
-This approach combines the strengths of decentralized blockchain infrastructure with the trust framework of the European Digital Identity ecosystem.
+In all cases, **transaction execution remains under user control or user-authorized logic**, and no third party independently executes the transaction on-chain.
+
+This approach combines the strengths of blockchain-based settlement (public or permissioned) with the trust framework of the European Digital Identity ecosystem.
 
 The architecture integrates:
 
-- **Decentralized blockchain settlement**
+- **Blockchain-based settlement**, either decentralized (public networks) or governed (permissioned DLTs)
 - **Qualified Electronic Attestations of Attributes (QEAA)** for identity and blockchain address control
 - **Privacy-preserving selective disclosure**
-- **Strong Customer Authentication aligned with EU payment standards (current TS12)**
-- **Regulatory alignment with EU frameworks including eIDAS 2.0, GDPR**
+- **Strong Customer Authentication aligned with EU payment standards (ARF TS12)**
+- **Regulatory alignment with EU frameworks including eIDAS 2.0 and GDPR**
 
-By combining verifiable digital identity with self-custodial crypto asset-payments, this model illustrates how the **EUDI Wallet can act as the trusted identity and consent layer for next-generation digital payments in Europe**.
+By combining verifiable digital identity with crypto-asset payments, this model illustrates how the **EUDI Wallet can act as the trusted identity and consent layer for next-generation digital payments in Europe**, across both open and regulated blockchain environments.
+
 
 # 2. Architecture Overview
 
@@ -143,13 +150,17 @@ The blockchain therefore becomes a **combined validation, execution, and settlem
 ## When to Choose Each Option
 
 
-| Scenario                                                     | Recommended Option                |
-| -------------------------------------------------------------- | ----------------------------------- |
-| Fast adoption and compatibility with existing wallets        | Option 1 — Dual Wallet           |
-| Minimal infrastructure / MVP deployment                      | Option 1 — Dual Wallet           |
-| High-value or regulated payments requiring strong guarantees | Option 2 — Smart Contract Wallet |
-| Need for programmable compliance or policy enforcement       | Option 2 — Smart Contract Wallet |
-| Desire for unified UX and reduced user friction              | Option 2 — Smart Contract Wallet |
+| Scenario                                                               | Recommended Option                |
+| ------------------------------------------------------------------------ | ----------------------------------- |
+| Web3-native environments (DeFi, public blockchains, existing wallets)  | Option 1 — Dual Wallet           |
+| Fast adoption and compatibility with existing crypto wallet ecosystems | Option 1 — Dual Wallet           |
+| Minimal infrastructure / MVP deployment                                | Option 1 — Dual Wallet           |
+| Open ecosystems prioritizing flexibility and interoperability          | Option 1 — Dual Wallet           |
+| Regulated financial environments (e.g. banks, payment institutions)    | Option 2 — Smart Contract Wallet |
+| Permissioned or hybrid DLT infrastructures                             | Option 2 — Smart Contract Wallet |
+| High-value payments requiring strong guarantees and enforcement        | Option 2 — Smart Contract Wallet |
+| Need for programmable compliance, policy enforcement, or auditability  | Option 2 — Smart Contract Wallet |
+| Desire for unified UX and reduced user friction                        | Option 2 — Smart Contract Wallet |
 
 # 3. Actors and components
 
@@ -218,7 +229,7 @@ Depending on the architecture:
 
 ## Blockchain Network
 
-Public blockchain infrastructure providing:
+DLT infrastructure providing:
 
 - **Dual Wallet Model** → **Settlement layer only**
 - **Smart Contract Wallet Model** → **Validation, execution, and settlement**

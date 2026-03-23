@@ -136,6 +136,21 @@ The gateway may act as a relay, but:
 
 ![Smart Contract Wallet Architecture](smart_contract_wallet.png)
 
+# When to Choose Each Option
+
+
+| Scenario                                                               | Recommended Option                |
+| ------------------------------------------------------------------------ | ----------------------------------- |
+| Web3-native environments (DeFi, public blockchains, existing wallets)  | Option 1 — Dual Wallet           |
+| Fast adoption and compatibility with existing crypto wallet ecosystems | Option 1 — Dual Wallet           |
+| Minimal infrastructure / MVP deployment                                | Option 1 — Dual Wallet           |
+| Open ecosystems prioritizing flexibility and interoperability          | Option 1 — Dual Wallet           |
+| Regulated financial environments (e.g. banks, payment institutions)    | Option 2 — Smart Contract Wallet |
+| Permissioned or hybrid DLT infrastructures                             | Option 2 — Smart Contract Wallet |
+| High-value payments requiring strong guarantees and enforcement        | Option 2 — Smart Contract Wallet |
+| Need for programmable compliance, policy enforcement, or auditability  | Option 2 — Smart Contract Wallet |
+| Desire for unified UX and reduced user friction                        | Option 2 — Smart Contract Wallet |
+
 # Roles and Actors
 
 ## Payer (Natural Person)
@@ -174,13 +189,28 @@ It **never acts on behalf of the user to initiate payment**.
 
 ## Blockchain Network
 
-The blockchain acts as a **neutral settlement layer**.
+The blockchain acts as a **neutral settlement and/or execution layer**, depending on the selected architecture.
 
 Supported networks may include:
 
-- Ethereum and EVM-compatible chains
-- Tezos
-- other DLTs
+- **Public blockchains**
+  - Ethereum and EVM-compatible chains  
+  - Tezos  
+  - other public DLT networks  
+
+- **Permissioned or consortium DLT networks**
+  - enterprise or banking infrastructures  
+  - regulated or access-controlled environments  
+
+- **Hybrid architectures**
+  - combinations of permissioned and public blockchains  
+  - where identity, compliance, or transaction logic may be handled off-chain or on permissioned layers, while settlement occurs on public networks  
+
+The choice of network depends on the use case:
+
+- **Public blockchains** → open ecosystems, interoperability, DeFi use cases  
+- **Permissioned DLTs** → regulated environments, institutional use cases, enhanced control and compliance  
+- **Hybrid models** → bridging regulated finance and public blockchain liquidity
 
 # Strong Customer Authentication (TS12)
 
