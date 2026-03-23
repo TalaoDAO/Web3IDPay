@@ -1,12 +1,12 @@
 # Secure Crypto Payments from Natural Persons to Merchants Using the EUDI Wallet
 
-Version 0.8.1
+Version 0.8.2
 
 23rd of March 2026
 
 # 1. Executive Overview
 
-This use case demonstrates how the **European Digital Identity Wallet (EUDI Wallet)** can enable secure and compliant **person-to-merchant (P2M) crypto-asset payments** in a context limited to **self-custodial wallets and public blockchain networks** , while preserving the decentralized nature of blockchain settlement.
+This use case demonstrates how the **European Digital Identity Wallet (EUDI Wallet)** can enable secure and compliant **person-to-merchant (P2M) crypto-asset payments** in a context limited to **self-custodial wallets and blockchain networks** , while preserving the decentralized nature of blockchain settlement.
 
 The model allows a natural person to pay a merchant using a **self-custodial crypto wallet**, while relying on the **EUDI Wallet as the trusted identity and authentication layer**. Through verifiable attestations, the payer proves both their identity and their control of the blockchain address used for the payment.
 
@@ -38,7 +38,7 @@ By combining verifiable digital identity with self-custodial crypto asset-paymen
 
 The proposed architecture separates **identity, payment authorization, and transaction execution** into distinct components, while preserving the decentralized nature of blockchain settlement.
 
-Two architectural options are considered to introduce an identity layer into crypto-asset transfers between non-custodial wallets on public blockchains.
+Two architectural options are considered to introduce an identity layer into crypto-asset transfers between non-custodial wallets on blockchains.
 
 ## Option 1 — Dual Wallet Model
 
